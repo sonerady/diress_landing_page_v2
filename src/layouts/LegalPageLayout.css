@@ -1,0 +1,168 @@
+.legal-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    height: 100%;
+    width: 100%;
+}
+
+.legal-content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* Changed from center to flex-start */
+    height: 100%;
+    padding: 20px 0;
+    overflow: hidden;
+    min-height: 0;
+    /* Critical for flex child scrolling */
+}
+
+.legal-paper {
+    background: #fff;
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    max-height: 100%;
+    padding: 40px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eee;
+    overflow-y: auto;
+    /* Scrollable content */
+    -webkit-overflow-scrolling: touch;
+    /* iOS momentum scroll */
+    border-radius: 4px;
+    /* Custom Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #ddd transparent;
+    position: relative;
+    z-index: 50;
+    /* Increased z-index */
+    pointer-events: auto;
+    /* Force pointer events */
+    text-align: left;
+    /* Left align text */
+}
+
+.legal-paper h1,
+.legal-paper h2,
+.legal-paper h3,
+.legal-paper h4,
+.legal-paper h5,
+.legal-paper h6 {
+    font-family: 'Playfair Display', serif;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.legal-paper p,
+.legal-paper li {
+    font-family: 'Lato', sans-serif;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.legal-paper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.legal-paper::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.legal-paper::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 20px;
+}
+
+/* Reuse col-side styles from HomeSection.css globally or import here if needed. 
+   Since we defined them in HomeSection.css, we might need to move them to global or duplicate.
+   Let's assume we move common grid styles to global or rely on them being present if HomeSection is loaded? 
+   No, CSS modules or scoped CSS might be an issue. 
+   Ideally, we should move the grid layout styles to a shared CSS or just redefine here for safety.
+*/
+
+.legal-layout .col-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 30px;
+    height: 100%;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    margin: 0;
+    padding-top: 40px;
+    /* Center vertically in grid */
+}
+
+/* Tooltip positioning overrides for this layout if needed */
+.left-side .historical-tooltip {
+    left: 120%;
+    right: auto;
+}
+
+.left-side .historical-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent #d4c5b0 transparent transparent;
+}
+
+.right-side .historical-tooltip {
+    right: 120%;
+    left: auto;
+}
+
+.right-side .historical-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent transparent #d4c5b0;
+}
+
+@media (max-width: 1024px) {
+    .legal-layout {
+        grid-template-columns: 100px 1fr 100px;
+    }
+}
+
+@media (max-width: 768px) {
+    .legal-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        gap: 0;
+    }
+
+    .legal-layout .col-side {
+        display: none;
+        /* Hide side icons on mobile for legal pages to focus on text */
+    }
+
+    .legal-paper {
+        padding: 20px;
+        box-shadow: none;
+        border: none;
+        height: auto;
+        /* Allow auto height on mobile */
+        overflow-y: visible;
+        /* Let page scroll handle it */
+    }
+
+    .legal-content-wrapper {
+        overflow-y: auto;
+        /* Move scroll to wrapper or just let body scroll? */
+        display: block;
+        /* Simplify for mobile */
+        height: auto;
+    }
+}

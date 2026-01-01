@@ -1,0 +1,248 @@
+#home-section {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    align-items: center;
+}
+
+.col-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 80%;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+.col-center {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.art-wrapper {
+    position: relative;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-portrait {
+    position: relative;
+    z-index: 2;
+    height: auto;
+    max-height: 55vh;
+    width: auto;
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.main-info h1 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 2.5rem;
+    color: #333;
+    margin-top: 40px;
+}
+
+.ai-red {
+    color: #e74c3c;
+}
+
+.main-info p {
+    font-size: 0.9rem;
+    color: #999;
+    margin-top: 5px;
+}
+
+/* Tooltip Positioning Logic */
+/* Left Column Tooltips (Open to Right) */
+.col-side:nth-child(1) .historical-tooltip {
+    left: 120%;
+    right: auto;
+}
+
+.col-side:nth-child(1) .historical-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent #d4c5b0 transparent transparent;
+}
+
+/* Right Column Tooltips (Open to Left) */
+.col-side:nth-child(3) .historical-tooltip {
+    right: 120%;
+    left: auto;
+}
+
+.col-side:nth-child(3) .historical-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent transparent #d4c5b0;
+}
+
+/* Hover States for Position */
+.col-side:nth-child(1) .thumbnail-group:hover .historical-tooltip {
+    left: 110%;
+}
+
+.col-side:nth-child(3) .thumbnail-group:hover .historical-tooltip {
+    right: 110%;
+}
+
+/* Responsive */
+/* Small laptops */
+@media (max-width: 1200px) {
+    .main-portrait {
+        max-height: 45vh;
+    }
+
+    .thumb-img-wrapper,
+    .thumb-img-layer {
+        width: 150px !important;
+        height: 150px !important;
+    }
+
+    .main-info h1 {
+        font-size: 2rem;
+        margin-top: 15px;
+    }
+}
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .main-portrait {
+        max-height: 40vh;
+    }
+
+    .thumb-img-wrapper,
+    .thumb-img-layer {
+        width: 130px !important;
+        height: 130px !important;
+    }
+
+    .col-side {
+        height: 75%;
+    }
+
+    .main-info h1 {
+        font-size: 1.8rem;
+        margin-top: 10px;
+    }
+
+    .thumb-info h4 {
+        font-size: 0.95rem;
+    }
+
+    .thumb-info span {
+        font-size: 0.7rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    #home-section {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr auto !important;
+        padding: 10px !important;
+        gap: 15px !important;
+        overflow: hidden !important;
+    }
+
+    .col-side {
+        flex-direction: row !important;
+        height: auto !important;
+        justify-content: space-around !important;
+        gap: 10px !important;
+    }
+
+    .col-side:nth-child(1) {
+        order: 1;
+    }
+
+    .col-center {
+        order: 2;
+    }
+
+    .col-side:nth-child(3) {
+        order: 3;
+        margin-top: -20px !important;
+    }
+
+    .art-wrapper {
+        height: auto !important;
+    }
+
+    .main-portrait {
+        max-height: 30vh !important;
+    }
+
+    .main-info h1 {
+        font-size: 1.5rem !important;
+        margin-top: 10px !important;
+    }
+
+    .main-info p {
+        font-size: 0.7rem !important;
+    }
+
+    .thumb-img-wrapper,
+    .thumb-img-layer {
+        width: 90px !important;
+        height: 90px !important;
+    }
+
+    .thumb-info h4 {
+        font-size: 0.85rem !important;
+    }
+
+    .thumb-info span {
+        font-size: 0.6rem !important;
+    }
+
+    .thumbnail-group {
+        gap: 8px !important;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+    .main-info h1 {
+        font-size: 1.3rem !important;
+    }
+
+    .main-portrait {
+        max-height: 25vh !important;
+    }
+
+    .thumb-img-wrapper,
+    .thumb-img-layer {
+        width: 75px !important;
+        height: 75px !important;
+    }
+
+    .thumb-info h4 {
+        font-size: 0.75rem !important;
+    }
+
+    .thumb-info span {
+        font-size: 0.55rem !important;
+    }
+}

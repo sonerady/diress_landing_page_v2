@@ -1,0 +1,35 @@
+.mouse-spotlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url('https://ulstercarpets.com/residential/wp-content/uploads/2019/09/Glenavy-Ethic-Panel-Rust-2-2648.jpg');
+    background-size: 600px;
+    background-repeat: repeat;
+    background-attachment: scroll;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    -webkit-mask-image: radial-gradient(circle 200px at var(--x, 50%) var(--y, 50%), black 20%, transparent 100%);
+    mask-image: radial-gradient(circle 200px at var(--x, 50%) var(--y, 50%), black 20%, transparent 100%);
+}
+
+@media (max-width: 768px) {
+    .mouse-spotlight {
+        display: none !important;
+    }
+}
+
+/* Spotlight active styles for other elements */
+nav a.spotlight-active,
+.logo.spotlight-active,
+.lang-switch.spotlight-active,
+.socials i.spotlight-active,
+.main-info p.spotlight-active,
+.legal-link.spotlight-active {
+    color: #fff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}

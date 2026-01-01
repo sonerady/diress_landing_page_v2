@@ -1,0 +1,146 @@
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 80px;
+    padding-right: 0;
+    height: 80px;
+    background-color: transparent;
+    z-index: 10;
+    /* background: #fff; Removed for transparency */
+    border-top: none;
+    /* Removed border for cleaner transparent look */
+}
+
+.socials i {
+    margin-right: 20px;
+    color: #888;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.socials i:hover {
+    color: #333;
+}
+
+.legal-link {
+    text-decoration: none;
+    color: #888;
+    font-size: 0.8rem;
+    margin-left: 20px;
+    font-family: 'Lato', sans-serif;
+}
+
+.legal-separator {
+    color: #ddd;
+    margin-left: 20px;
+    font-weight: 300;
+}
+
+.pagination-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.page-number {
+    background: #f0f0f0;
+    color: #333;
+    width: 100px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #fff;
+}
+
+.page-number .big-num {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.page-number .small-num {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* Next Button Style */
+.next-page-btn {
+    background: url('https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=500&q=80') center/cover;
+    width: 250px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+}
+
+.next-page-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    transition: background 0.3s;
+}
+
+.next-page-btn:hover::before {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.next-page-btn span,
+.next-page-btn i {
+    position: relative;
+    z-index: 2;
+}
+
+.next-page-btn i {
+    margin-left: 10px;
+}
+
+/* Prev Button Style */
+.prev-page-btn {
+    background: #ddd;
+    width: 150px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.prev-page-btn.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.prev-page-btn:hover {
+    background: #ccc;
+    color: #000;
+}
+
+.prev-page-btn i {
+    margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+    footer {
+        display: none !important;
+    }
+}

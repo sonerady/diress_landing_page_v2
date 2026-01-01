@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monailisa Lab Interface</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      /* --- Temel Ayarlar --- */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Lato", sans-serif;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        background-color: #fff;
+      }
+
+      /* --- Ana Konteyner --- */
+      .main-container {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-rows: 80px 1fr 80px;
+        overflow: hidden;
+      }
+
+      /* --- Header --- */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 50px;
+        z-index: 10;
+        background: #fff;
+      }
+
+      .logo img {
+        height: 50px;
+        width: auto;
+        display: block;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 40px;
+      }
+      nav a {
+        text-decoration: none;
+        color: #b0b0b0;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: color 0.3s;
+        cursor: pointer;
+      }
+      nav a.active,
+      nav a:hover {
+        color: #333;
+        font-weight: bold;
+      }
+
+      .lang-switch {
+        font-size: 0.9rem;
+        font-weight: bold;
+        color: #b0b0b0;
+        cursor: pointer;
+        font-family: "Lato", sans-serif;
+      }
+      .lang-switch span {
+        transition: color 0.3s;
+      }
+      .lang-switch span:hover {
+        color: #333;
+      }
+      .lang-switch span.active-lang {
+        color: #333;
+        border-bottom: 2px solid #e74c3c;
+      }
+
+      /* --- Slide Wrapper --- */
+      .content-mask {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .slider-track {
+        display: flex;
+        width: 300%;
+        height: 100%;
+        transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+      }
+
+      .page-section {
+        width: 33.333%;
+        height: 100%;
+        padding: 0 20px;
+      }
+
+      /* --- SAYFA 1: HOME --- */
+      #home-section {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 1fr;
+        align-items: center;
+      }
+
+      .col-side {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 80%;
+        align-items: center;
+        text-align: center;
+      }
+
+      .thumbnail-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        transition: transform 0.3s;
+        max-width: 250px;
+      }
+      .thumbnail-group:hover {
+        transform: scale(1.02);
+      }
+
+      .thumb-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 30px;
+        object-fit: cover;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        background-color: #f0f0f0;
+      }
+
+      .thumb-info h4 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.1rem;
+        color: #333;
+        font-style: italic;
+        margin-bottom: 5px;
+      }
+      .thumb-info span {
+        font-size: 0.75rem;
+        color: #888;
+        line-height: 1.4;
+        display: block;
+      }
+
+      .col-center {
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      .art-wrapper {
+        position: relative;
+        width: 100%;
+        height: 60%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .big-letter {
+        font-family: "Playfair Display", serif;
+        font-size: 25rem;
+        line-height: 1;
+        position: absolute;
+        z-index: 1;
+        opacity: 0.1;
+        color: #000;
+      }
+
+      /* GÜNCELLENEN KISIM: Orta Resim Stili */
+      .main-portrait {
+        position: relative;
+        z-index: 2;
+        /* Yükseklik ve genişlik auto yapılarak orijinal oran korundu */
+        height: auto;
+        max-height: 500px; /* Çok taşmaması için sınır */
+        width: auto;
+        max-width: 100%;
+
+        /* Yuvarlaklık kaldırıldı */
+        clip-path: none;
+        border-radius: 10px; /* Çok hafif yumuşatma */
+
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+      }
+
+      .main-info h1 {
+        font-family: "Playfair Display", serif;
+        font-style: italic;
+        font-weight: 400;
+        font-size: 3rem;
+        color: #333;
+        margin-top: 20px;
+      }
+      .ai-red {
+        color: #e74c3c;
+      }
+      .main-info p {
+        font-size: 0.9rem;
+        color: #999;
+        margin-top: 5px;
+      }
+
+      /* --- SAYFA 2: ABOUT --- */
+      #about-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 100px;
+        gap: 50px;
+      }
+      .about-text {
+        flex: 1;
+        text-align: left;
+      }
+      .about-text h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: #333;
+      }
+      .about-text p {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #666;
+        margin-bottom: 20px;
+      }
+      .about-img {
+        flex: 1;
+        height: 400px;
+        background: url("https://images.unsplash.com/photo-1549813069-f95e44d7f498?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80")
+          center/cover;
+        border-radius: 20px;
+        box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      /* --- SAYFA 3: CONTACTS --- */
+      #contacts-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      #contacts-section h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 3.5rem;
+        color: #333;
+        margin-bottom: 30px;
+      }
+      .contact-info-box {
+        background: #f9f9f9;
+        padding: 40px 60px;
+        border: 1px solid #eee;
+        border-radius: 10px;
+      }
+      .contact-item {
+        margin-bottom: 20px;
+      }
+      .contact-item i {
+        font-size: 1.5rem;
+        color: #555;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      /* --- Footer --- */
+      footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 50px;
+        padding-right: 0;
+        z-index: 10;
+        background: #fff;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      .socials i {
+        margin-right: 20px;
+        color: #888;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+      }
+      .socials i:hover {
+        color: #333;
+      }
+
+      .pagination-container {
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+
+      .page-number {
+        background: #f0f0f0;
+        color: #333;
+        width: 100px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Lato", sans-serif;
+        border-left: 1px solid #fff; /* Butonlar arası çizgi */
+        border-right: 1px solid #fff;
+      }
+      .page-number .big-num {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-right: 5px;
+      }
+      .page-number .small-num {
+        font-size: 0.8rem;
+        opacity: 0.7;
+      }
+
+      /* Next Button Stili */
+      .next-page-btn {
+        background: url("https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&w=500&q=80")
+          center/cover;
+        width: 250px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        font-size: 1rem;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        user-select: none;
+      }
+      .next-page-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        transition: background 0.3s;
+      }
+      .next-page-btn:hover::before {
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .next-page-btn span,
+      .next-page-btn i {
+        position: relative;
+        z-index: 2;
+      }
+      .next-page-btn i {
+        margin-left: 10px;
+      }
+
+      /* GÜNCELLENEN KISIM: Prev Button Stili */
+      .prev-page-btn {
+        background: #ddd; /* Next butondan farklı, sade bir renk */
+        width: 150px; /* Next'ten biraz daha dar olabilir */
+        height: 100%;
+        display: flex; /* Varsayılan flex, JS ile none yapılacak */
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        font-size: 0.9rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s, color 0.3s;
+        user-select: none;
+        /* İlk başta gizli olsun (JS ile yönetilecek ama css başlangıcı) */
+        opacity: 0;
+        pointer-events: none;
+      }
+      .prev-page-btn.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .prev-page-btn:hover {
+        background: #ccc;
+        color: #000;
+      }
+      .prev-page-btn i {
+        margin-right: 10px;
+      }
+
+      @media (max-width: 1200px) {
+        .big-letter {
+          font-size: 15rem;
+        }
+        .main-portrait {
+          height: 300px;
+        }
+        .thumb-img {
+          width: 90px;
+          height: 90px;
+        }
+        #about-section {
+          padding: 0 40px;
+        }
+        .about-text h2 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <!-- Header -->
+      <header>
+        <div class="logo">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/3600/3600967.png"
+            alt="Monailisa Logo"
+          />
+        </div>
+        <nav>
+          <ul>
+            <li>
+              <a
+                onclick="goToPage(0)"
+                id="nav-home"
+                class="active"
+                data-lang-key="home"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a onclick="goToPage(1)" id="nav-about" data-lang-key="about"
+                >About</a
+              >
+            </li>
+            <li>
+              <a
+                onclick="goToPage(2)"
+                id="nav-contacts"
+                data-lang-key="contacts"
+                >Contacts</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="lang-switch">
+          <span onclick="setLang('en')" id="lang-en" class="active-lang"
+            >EN</span
+          >
+          /
+          <span onclick="setLang('tr')" id="lang-tr">TR</span>
+        </div>
+      </header>
+
+      <!-- İçerik Slider -->
+      <main class="content-mask">
+        <div class="slider-track" id="sliderTrack">
+          <!-- 1. HOME -->
+          <section class="page-section" id="home-section">
+            <div class="col-side">
+              <div class="thumbnail-group">
+                <img
+                  src="https://www.monailisa.com/static/media/diress.da42b2f4ddf695895008.png"
+                  class="thumb-img"
+                  alt="Diress App"
+                />
+                <div class="thumb-info">
+                  <h4>Diress</h4>
+                  <span data-lang-key="diressDesc"
+                    >AI Model application for sellers to dress mannequins.</span
+                  >
+                </div>
+              </div>
+              <div class="thumbnail-group">
+                <img
+                  src="https://www.monailisa.com/static/media/wearup.1dda5639506d70da9277.png"
+                  class="thumb-img"
+                  alt="Wearup App"
+                />
+                <div class="thumb-info">
+                  <h4>Wearup</h4>
+                  <span data-lang-key="wearupDesc"
+                    >AI Outfit combination application.</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="col-center">
+              <div class="art-wrapper">
+                <div class="big-letter">M</div>
+                <!-- Orta Resim -->
+                <img
+                  src="https://replicate.delivery/xezq/mfTfdXNojJj3iEmDy6bvU6evWnfuDPtRrYQ7J2MovCLGJ43WB/tmpq8fp7trx.png"
+                  class="main-portrait"
+                  alt="AI Generated Portrait"
+                />
+              </div>
+              <div class="main-info">
+                <h1>Mon<span class="ai-red">ai</span>lisa Lab</h1>
+                <p data-lang-key="artist">
+                  Reimagining Art with Artificial Intelligence
+                </p>
+              </div>
+            </div>
+
+            <div class="col-side">
+              <div class="thumbnail-group">
+                <img
+                  src="https://www.monailisa.com/static/media/producter.e8be48ce1afc55c666eb.png"
+                  class="thumb-img"
+                  alt="Producter App"
+                />
+                <div class="thumb-info">
+                  <h4>Producter</h4>
+                  <span data-lang-key="producterDesc"
+                    >AI Product photography studio.</span
+                  >
+                </div>
+              </div>
+              <div class="thumbnail-group">
+                <img
+                  src="https://www.monailisa.com/static/media/minipi.6ee0943aa8e03e416bde.png"
+                  class="thumb-img"
+                  alt="Minipi App"
+                />
+                <div class="thumb-info">
+                  <h4>Minipi</h4>
+                  <span data-lang-key="minipiDesc"
+                    >AI Newborn concept templates for kids.</span
+                  >
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. ABOUT -->
+          <section class="page-section" id="about-section">
+            <div class="about-text">
+              <h2 data-lang-key="aboutTitle">About The Gallery</h2>
+              <p data-lang-key="aboutDesc">
+                Welcome to Monailisa Lab. We blend classical masterpieces with
+                artificial intelligence to create unique perspectives.
+              </p>
+              <p data-lang-key="aboutDesc2">
+                Designed with a focus on elegance, we believe art should evolve.
+              </p>
+              <div style="margin-top: 20px; color: #999; font-style: italic">
+                Est. 2023
+              </div>
+            </div>
+            <div class="about-img"></div>
+          </section>
+
+          <!-- 3. CONTACTS -->
+          <section class="page-section" id="contacts-section">
+            <h2 data-lang-key="contactTitle">Get in Touch</h2>
+            <div class="contact-info-box">
+              <div class="contact-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span data-lang-key="address">123 Art Avenue, Design City</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>contact@monailisa.com</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <span>+1 (555) 123-4567</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer>
+        <div class="socials">
+          <i class="fab fa-facebook-f"></i>
+          <i class="fab fa-instagram"></i>
+          <i class="fab fa-twitter"></i>
+        </div>
+
+        <!-- Sayfalama Alanı -->
+        <div class="pagination-container">
+          <!-- PREV BUTTON (Solda) -->
+          <div class="prev-page-btn" id="prevBtn" onclick="prevSlide()">
+            <i class="fas fa-chevron-left"></i>
+            <span data-lang-key="prevPage">PREV PAGE</span>
+          </div>
+
+          <!-- SAYFA NUMARASI (Ortada) -->
+          <div class="page-number">
+            <span class="big-num" id="page-indicator">01</span>
+            <span class="small-num">03</span>
+          </div>
+
+          <!-- NEXT BUTTON (Sağda) -->
+          <div class="next-page-btn" onclick="nextSlide()">
+            <span data-lang-key="nextPage">NEXT PAGE</span>
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // --- Değişkenler ---
+      let currentIndex = 0;
+      const totalPages = 3;
+      const sliderTrack = document.getElementById("sliderTrack");
+      const pageIndicator = document.getElementById("page-indicator");
+      const prevBtn = document.getElementById("prevBtn");
+      const navLinks = [
+        document.getElementById("nav-home"),
+        document.getElementById("nav-about"),
+        document.getElementById("nav-contacts"),
+      ];
+
+      // --- Dil Verisi ---
+      const translations = {
+        en: {
+          home: "Home",
+          about: "About",
+          contacts: "Contacts",
+          artist: "Reimagining Art with Artificial Intelligence",
+          aboutTitle: "About The Gallery",
+          aboutDesc:
+            "Welcome to Monailisa Lab. We blend classical masterpieces with artificial intelligence to create unique perspectives.",
+          aboutDesc2:
+            "Designed with a focus on elegance, we believe art should evolve.",
+          contactTitle: "Get in Touch",
+          address: "123 Art Avenue, Design City",
+          nextPage: "NEXT PAGE",
+          prevPage: "PREV PAGE",
+          diressDesc: "AI Model application for sellers to dress mannequins.",
+          wearupDesc: "AI Outfit combination application.",
+          producterDesc: "AI Product photography studio.",
+          minipiDesc: "AI Newborn concept templates for kids.",
+        },
+        tr: {
+          home: "Anasayfa",
+          about: "Hakkında",
+          contacts: "İletişim",
+          artist: "Sanatın Yapay Zeka ile Yeniden Yorumu",
+          aboutTitle: "Galeri Hakkında",
+          aboutDesc:
+            "Monailisa Lab'e hoş geldiniz. Klasik başyapıtları yapay zeka ile harmanlayarak benzersiz bakış açıları oluşturuyoruz.",
+          aboutDesc2:
+            "Zarafete odaklanarak tasarlandı, sanatın evrimleşmesi gerektiğine inanıyoruz.",
+          contactTitle: "Bize Ulaşın",
+          address: "123 Sanat Caddesi, Tasarım Kenti",
+          nextPage: "SONRAKİ",
+          prevPage: "ÖNCEKİ",
+          diressDesc:
+            "Mağaza sahipleri için ürünlerini mankene giydiren yapay zeka uygulaması.",
+          wearupDesc: "Yapay zeka outfit ve kıyafet kombin uygulaması.",
+          producterDesc: "Ürün fotoğraflama işleri için yapay zeka uygulaması.",
+          minipiDesc:
+            "Çocuklar için yapay zeka yenidoğan konsept şablon uygulaması.",
+        },
+      };
+
+      // --- Fonksiyonlar ---
+      function goToPage(index) {
+        currentIndex = index;
+        updateUI();
+      }
+
+      function nextSlide() {
+        currentIndex++;
+        if (currentIndex >= totalPages) currentIndex = 0; // Başa dön
+        updateUI();
+      }
+
+      function prevSlide() {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateUI();
+        }
+      }
+
+      function updateUI() {
+        // Slider Kaydır
+        const translateValue = -(currentIndex * 33.333);
+        sliderTrack.style.transform = `translateX(${translateValue}%)`;
+
+        // Navigasyon Linkini Güncelle
+        navLinks.forEach((link) => link.classList.remove("active"));
+        navLinks[currentIndex].classList.add("active");
+
+        // Sayfa Numarasını Güncelle
+        pageIndicator.innerText = `0${currentIndex + 1}`;
+
+        // Prev Button Görünürlüğü
+        if (currentIndex === 0) {
+          prevBtn.classList.remove("visible");
+        } else {
+          prevBtn.classList.add("visible");
+        }
+      }
+
+      function setLang(lang) {
+        document.getElementById("lang-en").classList.remove("active-lang");
+        document.getElementById("lang-tr").classList.remove("active-lang");
+        document.getElementById(`lang-${lang}`).classList.add("active-lang");
+
+        const elements = document.querySelectorAll("[data-lang-key]");
+        elements.forEach((el) => {
+          const key = el.getAttribute("data-lang-key");
+          if (translations[lang][key]) {
+            el.innerText = translations[lang][key];
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+/* Costs component styles */
+.costs-container {
+  margin: 0;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background: #fff;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.costs-container h1,
+.costs-container h2 {
+  color: #0a7;
+  margin-top: 24px;
+}
+
+.costs-container h1 {
+  font-size: 1.8rem;
+}
+
+.costs-container h2 {
+  font-size: 1.4rem;
+}
+
+.costs-container p {
+  margin: 8px 0;
+}
+
+/* Table styles */
+.costs-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.costs-container th,
+.costs-container td {
+  padding: 8px 6px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.costs-container th {
+  background: #f4f4f4;
+}
+
+.costs-container .cost-total {
+  font-weight: bold;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .costs-container {
+    padding: 12px;
+  }
+
+  .costs-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .costs-container h2 {
+    font-size: 1.2rem;
+  }
+}

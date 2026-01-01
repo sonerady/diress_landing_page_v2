@@ -1,0 +1,98 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 80px;
+    height: 80px;
+    background-color: transparent;
+    z-index: 10;
+}
+
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400;
+    font-size: 2rem;
+    color: #333;
+}
+
+.logo .dot {
+    color: #e74c3c;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 40px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #b0b0b0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+nav a.active,
+nav a:hover {
+    color: #333;
+    font-weight: bold;
+}
+
+.lang-switch {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #b0b0b0;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+}
+
+.lang-switch span {
+    transition: color 0.3s;
+}
+
+.lang-switch span:hover {
+    color: #333;
+}
+
+.lang-switch span.active-lang {
+    color: #333;
+    border-bottom: 2px solid #e74c3c;
+}
+
+@media (max-width: 1200px) {
+    header {
+        padding: 0 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 0 20px;
+        height: 60px;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    nav ul {
+        gap: 15px;
+    }
+
+    nav a {
+        font-size: 0.65rem;
+    }
+
+    .lang-switch {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    nav a {
+        font-size: 0.6rem;
+    }
+}
