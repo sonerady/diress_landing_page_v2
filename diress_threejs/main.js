@@ -28,7 +28,13 @@ let isScrolling = false;
 // Parallax State
 let mouseX = 0;
 let mouseY = 0;
+// Smoothed mouse values for interpolation
+let smoothedMouse = { x: 0, y: 0 };
+// Flag to center parallax until user moves mouse after scene change
+let isParallaxLocked = false;
+
 const parallaxStrength = { background: 0.015, foreground: 0.04 };
+
 
 // DOM Elements
 const mainContainer = document.getElementById('main-container');
@@ -249,19 +255,30 @@ function animate() {
         uniforms.progress.value = targetProgress;
     }
 
-    // Apply parallax offsets for scenes with foreground (Scene 1 and 2)
+    // Apply parallax offsets for scenes with foreground (Scene 1, 2, 3)
     const hasForeground = foregroundImages[currentScene] !== null;
     if (hasForeground && currentStep === 0) {
-        plane.position.x = mouseX * parallaxStrength.background;
-        plane.position.y = -mouseY * parallaxStrength.background;
-        foregroundPlane.position.x = mouseX * parallaxStrength.foreground;
-        foregroundPlane.position.y = -mouseY * parallaxStrength.foreground;
+        // Determine target based on lock state
+        const targetX = isParallaxLocked ? 0 : mouseX;
+        const targetY = isParallaxLocked ? 0 : -mouseY; // Note: Inverted Y moved here for consistency
+
+        // Smoothly interpolate current values to target (Lerp factor 0.05 for smooth feel)
+        smoothedMouse.x += (targetX - smoothedMouse.x) * 0.05;
+        smoothedMouse.y += (targetY - smoothedMouse.y) * 0.05;
+
+        plane.position.x = smoothedMouse.x * parallaxStrength.background;
+        plane.position.y = smoothedMouse.y * parallaxStrength.background;
+        foregroundPlane.position.x = smoothedMouse.x * parallaxStrength.foreground;
+        foregroundPlane.position.y = smoothedMouse.y * parallaxStrength.foreground;
     } else {
         // Reset positions when not in a parallax scene
         plane.position.x = 0;
         plane.position.y = 0;
         foregroundPlane.position.x = 0;
         foregroundPlane.position.y = 0;
+        // Also reset smoothed values so next time it starts from center
+        smoothedMouse.x = 0;
+        smoothedMouse.y = 0;
     }
 
     renderer.render(scene, camera);
@@ -286,6 +303,9 @@ function transitionToScene(index) {
     targetProgress = 1;
 
     currentScene = index;
+
+    // Reset parallax to center until mouse moves
+    isParallaxLocked = true;
 
     // Update foreground texture and show/hide for Scene 1 and 2
     updateForegroundTexture();
@@ -351,6 +371,9 @@ renderSteps();
 
 // Mouse/Wheel
 window.addEventListener('mousemove', (e) => {
+    // Unlock parallax when user intentionally moves mouse
+    isParallaxLocked = false;
+
     // Normalize mouse position to -1 to 1 range
     const rect = artWrapper.getBoundingClientRect();
     mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
