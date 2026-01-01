@@ -21,7 +21,7 @@ const foregroundImages = [
     null                                                     // Scene 4
 ];
 const steps = [
-    'Select Scene', 'Ecommerce Kits', 'Customize Model', 'Retouch', 'Change Color', 'Change Pose', 'Image to Video'
+    'Virtual Model', 'Select Scene', 'Ecommerce Kits', 'Customize Model', 'Retouch', 'Change Color', 'Change Pose', 'Image to Video'
 ];
 let isScrolling = false;
 
@@ -77,6 +77,7 @@ uniform sampler2D texture2;
 uniform float progress;
 uniform vec2 uvScale1;
 uniform vec2 uvScale2;
+uniform vec2 uvOffset; // Parallax Offset
 varying vec2 vUv;
 
 vec4 blur(sampler2D tex, vec2 uv, float amount) {
@@ -96,8 +97,11 @@ vec4 blur(sampler2D tex, vec2 uv, float amount) {
 void main() {
     float blurAmount = sin(progress * 3.14159);
     
-    vec2 correctedUV1 = (vUv - 0.5) * uvScale1 + 0.5;
-    vec2 correctedUV2 = (vUv - 0.5) * uvScale2 + 0.5;
+    // Apply parallax offset
+    vec2 offsetUV = vUv - uvOffset;
+
+    vec2 correctedUV1 = (offsetUV - 0.5) * uvScale1 + 0.5;
+    vec2 correctedUV2 = (offsetUV - 0.5) * uvScale2 + 0.5;
 
     vec4 col1 = blur(texture1, correctedUV1, blurAmount);
     vec4 col2 = blur(texture2, correctedUV2, blurAmount);
@@ -121,7 +125,8 @@ const uniforms = {
     texture2: { value: textures[0] },
     progress: { value: 0 },
     uvScale1: { value: new THREE.Vector2(1, 1) },
-    uvScale2: { value: new THREE.Vector2(1, 1) }
+    uvScale2: { value: new THREE.Vector2(1, 1) },
+    uvOffset: { value: new THREE.Vector2(0, 0) } // NEW
 };
 const material = new THREE.ShaderMaterial({
     uniforms: uniforms,
@@ -189,11 +194,11 @@ function createTextTexture() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Text Style - Reduced size to prevent cut off if scaled down
-    ctx.font = 'bold 250px "Playfair Display", serif';
+    ctx.font = 'bold 300px "Playfair Display", serif';
     ctx.fillStyle = 'rgba(255, 255, 255, 1.0)'; // Fully Opaque White
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.letterSpacing = '20px';
+    ctx.letterSpacing = '100px';
 
     // Draw Text - centered
     ctx.fillText('DIRESS', canvas.width / 2, canvas.height / 2);
@@ -214,8 +219,47 @@ const textMaterial = new THREE.MeshBasicMaterial({
     side: THREE.DoubleSide
 });
 
+// Text Plane "DIRESS"
+// ... (existing text code) ...
+
+// Right Gradient Plane (for contrast behind Scene Text, but behind DIRESS)
+function createGradientTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 1;
+    const ctx = canvas.getContext('2d');
+
+    // Gradient: Transparent (Left) -> Black (Right)
+    // To match CSS width: 50%, we can make the gradient start at 50%
+    const gradient = ctx.createLinearGradient(0, 0, 512, 0);
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+    gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0)'); // Start fading from middle
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)'); // Dark at right edge
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 512, 1);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    return texture;
+}
+
+const gradientGeometry = new THREE.PlaneGeometry(2, 2); // Full screen
+const gradientMaterial = new THREE.MeshBasicMaterial({
+    map: createGradientTexture(),
+    transparent: true,
+    opacity: 1,
+    toneMapped: false,
+    depthWrite: false
+});
+
+const gradientPlane = new THREE.Mesh(gradientGeometry, gradientMaterial);
+gradientPlane.position.z = 0.02; // BEHIND Text (0.05) and FG (0.1), but FRONT of BG (0)
+// scene.add(gradientPlane);
+
 const textPlane = new THREE.Mesh(textGeometry, textMaterial);
-textPlane.position.z = 0.05; // Between bg (0) and fg (0.1)
+textPlane.position.z = 0.05; // FRONT of Gradient (0.02)
 textPlane.position.y = 0.45; // Moved further up
 textPlane.scale.set(0.8, 1.1, 1); // Stretched Y to fix squashed look
 scene.add(textPlane);
@@ -225,10 +269,13 @@ function getScale(image) {
     const screenAspect = artWrapper.clientWidth / artWrapper.clientHeight;
     const imageAspect = image.width / image.height;
 
+    // Zoom in slightly (0.98) to leave room for parallax movement
+    const zoom = 0.98;
+
     if (screenAspect > imageAspect) {
-        return new THREE.Vector2(1, imageAspect / screenAspect);
+        return new THREE.Vector2(1 * zoom, (imageAspect / screenAspect) * zoom);
     } else {
-        return new THREE.Vector2(screenAspect / imageAspect, 1);
+        return new THREE.Vector2((screenAspect / imageAspect) * zoom, 1 * zoom);
     }
 }
 
@@ -307,6 +354,7 @@ function updateTextScale() {
 
 // Initial call
 updateTextScale();
+updateUI(); // Ensure correct initial state (Step 0, Scene 0)
 
 // Animation
 let targetProgress = 0;
@@ -322,7 +370,7 @@ function animate() {
 
     // Apply parallax offsets for scenes with foreground (Scene 1, 2, 3)
     const hasForeground = foregroundImages[currentScene] !== null;
-    if (hasForeground && currentStep === 0) {
+    if ((hasForeground || currentScene === 0) && currentStep === 0) {
         // Determine target based on lock state
         const targetX = isParallaxLocked ? 0 : mouseX;
         const targetY = isParallaxLocked ? 0 : -mouseY; // Note: Inverted Y moved here for consistency
@@ -331,16 +379,30 @@ function animate() {
         smoothedMouse.x += (targetX - smoothedMouse.x) * 0.05;
         smoothedMouse.y += (targetY - smoothedMouse.y) * 0.05;
 
-        plane.position.x = smoothedMouse.x * parallaxStrength.background;
-        plane.position.y = smoothedMouse.y * parallaxStrength.background;
+        // Apply parallax via UV Offset for background plane (custom shader)
+        uniforms.uvOffset.value.x = smoothedMouse.x * parallaxStrength.background;
+        uniforms.uvOffset.value.y = smoothedMouse.y * parallaxStrength.background;
+
         foregroundPlane.position.x = smoothedMouse.x * parallaxStrength.foreground;
         foregroundPlane.position.y = smoothedMouse.y * parallaxStrength.foreground;
+
+        // DIRESS Text Parallax (Opposite direction, lighter)
+        if (textPlane) {
+            const textParallaxFactor = -0.02; // Opposite direction
+            textPlane.position.x = smoothedMouse.x * textParallaxFactor;
+            textPlane.position.y = 0.45 + (smoothedMouse.y * textParallaxFactor);
+        }
     } else {
         // Reset positions when not in a parallax scene
-        plane.position.x = 0;
-        plane.position.y = 0;
+        uniforms.uvOffset.value.x = 0;
+        uniforms.uvOffset.value.y = 0;
         foregroundPlane.position.x = 0;
         foregroundPlane.position.y = 0;
+
+        if (textPlane) {
+            textPlane.position.x = 0;
+            textPlane.position.y = 0.45;
+        }
         // Also reset smoothed values so next time it starts from center
         smoothedMouse.x = 0;
         smoothedMouse.y = 0;
@@ -396,11 +458,27 @@ function updateUI() {
         foregroundMaterial.opacity = 0;
     }
 
-    // Toggle DIRESS Text Plane - Show in Scene 1, 2, 3 (hidden in Scene 0)
-    if (currentScene > 0 && currentScene < 4 && currentStep === 0) {
+    // Toggle DIRESS Text Plane and Gradient Plane
+    if (currentStep === 0) {
+        // Show in all Scenes (0, 1, 2, 3) if in Step 0
         textPlane.visible = true;
+
+        if (currentScene === 0) {
+            // Scene 0: Black text, placed BEHIND the main background image
+            textPlane.material.color.setHex(0xeeeeee);
+            textPlane.position.z = -1.0;
+            textPlane.renderOrder = -1; // Force draw earlier
+        } else {
+            // Other Scenes: White text, placed IN FRONT of background/gradient
+            textPlane.material.color.setHex(0xffffff);
+            textPlane.position.z = 0.05;
+            textPlane.renderOrder = 1; // Default/Front
+        }
+
+        // gradientPlane.visible = true; // Still disabled
     } else {
         textPlane.visible = false;
+        // gradientPlane.visible = false;
     }
 
     if (currentStep > 0 || currentScene > 0) {
@@ -439,8 +517,19 @@ sceneThumbs.forEach(thumb => {
 function renderSteps() {
     verticalSlider.innerHTML = '';
     steps.forEach((label, index) => {
+        // Determine visual active state (separate from actual currentStep)
+        // Scene 0 = highlight Virtual Model (index 0)
+        // Scene 1-3 = highlight Select Scene (index 1)
+        let isVisuallyActive = false;
+        if (currentStep === 0) {
+            if (currentScene === 0 && index === 0) isVisuallyActive = true;
+            else if (currentScene > 0 && currentScene < 4 && index === 1) isVisuallyActive = true;
+        } else {
+            isVisuallyActive = (currentStep === index);
+        }
+
         const item = document.createElement('div');
-        item.className = `step-item ${currentStep === index ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`;
+        item.className = `step-item ${isVisuallyActive ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`;
         item.innerHTML = `<span class="step-dot"></span><span class="step-label">${label}</span>`;
         item.onclick = () => {
             currentStep = index;

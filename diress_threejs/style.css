@@ -121,12 +121,13 @@ body {
     transition: opacity 0.8s ease;
 }
 
-.main-container.step-0.scene-1 .right-gradient-overlay,
+/* CSS Gradient removed in favor of Three.js gradient for better layering */
+/* .main-container.step-0.scene-1 .right-gradient-overlay,
 .main-container.step-0.scene-2 .right-gradient-overlay,
 .main-container.step-0.scene-3 .right-gradient-overlay {
     opacity: 1;
     visibility: visible;
-}
+} */
 
 /* Header Contrast for Dark Scene */
 .main-container.step-0.scene-1 .logo-text,
@@ -341,7 +342,7 @@ body {
 .scene-text-container {
     position: absolute;
     top: 50%;
-    right: 8%;
+    right: 40px;
     width: 600px;
     z-index: 80;
     transform: translateY(-50%);
@@ -1444,6 +1445,10 @@ footer {
 @media (max-width: 1024px) {
     .main-portrait {
         max-height: 40vh;
+    }
+
+    .scene-text-container {
+        right: 15px;
     }
 
     .thumb-img-wrapper,
