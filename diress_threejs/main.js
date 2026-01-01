@@ -198,7 +198,7 @@ function createTextTexture() {
     ctx.fillStyle = 'rgba(255, 255, 255, 1.0)'; // Fully Opaque White
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.letterSpacing = '100px';
+    ctx.letterSpacing = '120px';
 
     // Draw Text - centered
     ctx.fillText('DIRESS', canvas.width / 2, canvas.height / 2);
@@ -260,7 +260,7 @@ gradientPlane.position.z = 0.02; // BEHIND Text (0.05) and FG (0.1), but FRONT o
 
 const textPlane = new THREE.Mesh(textGeometry, textMaterial);
 textPlane.position.z = 0.05; // FRONT of Gradient (0.02)
-textPlane.position.y = 0.45; // Moved further up
+textPlane.position.y = 0.65; // Moved even further up
 textPlane.scale.set(0.8, 1.1, 1); // Stretched Y to fix squashed look
 scene.add(textPlane);
 
@@ -390,7 +390,7 @@ function animate() {
         if (textPlane) {
             const textParallaxFactor = -0.02; // Opposite direction
             textPlane.position.x = smoothedMouse.x * textParallaxFactor;
-            textPlane.position.y = 0.45 + (smoothedMouse.y * textParallaxFactor);
+            textPlane.position.y = 0.65 + (smoothedMouse.y * textParallaxFactor);
         }
     } else {
         // Reset positions when not in a parallax scene
@@ -401,7 +401,7 @@ function animate() {
 
         if (textPlane) {
             textPlane.position.x = 0;
-            textPlane.position.y = 0.45;
+            textPlane.position.y = 0.65;
         }
         // Also reset smoothed values so next time it starts from center
         smoothedMouse.x = 0;
