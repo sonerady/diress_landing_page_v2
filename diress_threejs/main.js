@@ -42,6 +42,8 @@ const scrollIndicator = document.getElementById('scroll-indicator');
 const verticalSlider = document.getElementById('vertical-slider');
 const magnifier = document.getElementById('magnifier');
 const artWrapper = document.getElementById('art-wrapper');
+const sceneSelector = document.getElementById('scene-selector');
+const sceneThumbs = document.querySelectorAll('.scene-thumb');
 
 // Three.js Setup
 const scene = new THREE.Scene();
@@ -337,6 +339,7 @@ function updateUI() {
         scrollIndicator.classList.remove('hidden');
     }
     renderSteps();
+    updateSceneSelector();
 
     // Explicitly handle magnifier visibility
     if (currentScene === 0 && currentStep === 0) {
@@ -347,6 +350,28 @@ function updateUI() {
         magnifier.style.display = 'none';
     }
 }
+
+// Scene Selector - Update active thumbnail
+function updateSceneSelector() {
+    sceneThumbs.forEach(thumb => {
+        const sceneNum = parseInt(thumb.dataset.scene);
+        if (sceneNum === currentScene) {
+            thumb.classList.add('active');
+        } else {
+            thumb.classList.remove('active');
+        }
+    });
+}
+
+// Scene Selector - Click handlers
+sceneThumbs.forEach(thumb => {
+    thumb.addEventListener('click', () => {
+        const targetScene = parseInt(thumb.dataset.scene);
+        if (targetScene !== currentScene && currentStep === 0) {
+            transitionToScene(targetScene);
+        }
+    });
+});
 
 function renderSteps() {
     verticalSlider.innerHTML = '';
