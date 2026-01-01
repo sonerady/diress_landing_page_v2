@@ -112,11 +112,52 @@ void main() {
 
 // Texture Loader
 const loader = new THREE.TextureLoader();
-const textures = scenes.map(url => loader.load(url, (tex) => {
-    tex.minFilter = THREE.LinearFilter;
-    tex.generateMipmaps = false;
-    updateAllUVScales();
-}));
+
+// Video element for Scene 1
+const videoElement1 = document.createElement('video');
+videoElement1.src = '/assets/center_image_scene_1.mp4';
+videoElement1.loop = true;
+videoElement1.muted = true;
+videoElement1.playsInline = true;
+videoElement1.crossOrigin = 'anonymous';
+videoElement1.load();
+
+// Video element for Scene 2
+const videoElement2 = document.createElement('video');
+videoElement2.src = '/assets/center_image_scene_2.mp4';
+videoElement2.loop = true;
+videoElement2.muted = true;
+videoElement2.playsInline = true;
+videoElement2.crossOrigin = 'anonymous';
+videoElement2.load();
+
+// Create VideoTextures
+const videoTexture1 = new THREE.VideoTexture(videoElement1);
+videoTexture1.minFilter = THREE.LinearFilter;
+videoTexture1.magFilter = THREE.LinearFilter;
+videoTexture1.format = THREE.RGBAFormat;
+videoTexture1.generateMipmaps = false;
+
+const videoTexture2 = new THREE.VideoTexture(videoElement2);
+videoTexture2.minFilter = THREE.LinearFilter;
+videoTexture2.magFilter = THREE.LinearFilter;
+videoTexture2.format = THREE.RGBAFormat;
+videoTexture2.generateMipmaps = false;
+
+// Load textures - Scene 1 and 2 use video, others use images
+const textures = scenes.map((url, index) => {
+    if (index === 1) {
+        return videoTexture1;
+    } else if (index === 2) {
+        return videoTexture2;
+    } else {
+        return loader.load(url, (tex) => {
+            tex.minFilter = THREE.LinearFilter;
+            tex.generateMipmaps = false;
+            updateAllUVScales();
+        });
+    }
+});
 
 // Geometry & Material
 const geometry = new THREE.PlaneGeometry(2, 2);
@@ -441,6 +482,18 @@ function transitionToScene(index) {
         foregroundMaterial.opacity = 1;
     } else {
         foregroundMaterial.opacity = 0;
+    }
+
+    // Video playback control for Scene 1 and Scene 2
+    if (index === 1) {
+        videoElement1.play().catch(e => console.log('Video 1 autoplay blocked:', e));
+        videoElement2.pause();
+    } else if (index === 2) {
+        videoElement2.play().catch(e => console.log('Video 2 autoplay blocked:', e));
+        videoElement1.pause();
+    } else {
+        videoElement1.pause();
+        videoElement2.pause();
     }
 
     updateUI();
