@@ -178,6 +178,48 @@ foregroundPlane.renderOrder = 999;
 scene.add(foregroundPlane);
 console.log('🎭 Foreground plane added at z=0.1');
 
+// Text Plane "DIRESS"
+function createTextTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 2048;
+    canvas.height = 1024;
+    const ctx = canvas.getContext('2d');
+
+    // Transparent background
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Text Style - Reduced size to prevent cut off if scaled down
+    ctx.font = 'bold 250px "Playfair Display", serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 1.0)'; // Fully Opaque White
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = '20px';
+
+    // Draw Text - centered
+    ctx.fillText('DIRESS', canvas.width / 2, canvas.height / 2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    return texture;
+}
+
+const textGeometry = new THREE.PlaneGeometry(2, 1); // 2:1 aspect ratio
+const textMaterial = new THREE.MeshBasicMaterial({
+    map: createTextTexture(),
+    transparent: true,
+    opacity: 1,
+    toneMapped: false,
+    alphaTest: 0.01,
+    side: THREE.DoubleSide
+});
+
+const textPlane = new THREE.Mesh(textGeometry, textMaterial);
+textPlane.position.z = 0.05; // Between bg (0) and fg (0.1)
+textPlane.position.y = 0.45; // Moved further up
+textPlane.scale.set(0.8, 1.1, 1); // Stretched Y to fix squashed look
+scene.add(textPlane);
+
 function getScale(image) {
     if (!image || !image.width) return new THREE.Vector2(1, 1);
     const screenAspect = artWrapper.clientWidth / artWrapper.clientHeight;
@@ -242,8 +284,29 @@ const resizeObserver = new ResizeObserver(() => {
     renderer.setSize(width, height);
     updateAllUVScales();
     updateForegroundUVScale();
+    updateTextScale();
 });
 resizeObserver.observe(artWrapper);
+
+// Handle Resize for Text Plane to prevent distortion
+function updateTextScale() {
+    if (!textPlane) return;
+    const width = artWrapper.clientWidth;
+    const height = artWrapper.clientHeight;
+    // Prevent division by zero
+    if (height === 0) return;
+
+    // Calculate aspect based on artWrapper dimensions
+    const aspect = width / height;
+
+    // Maintain 2:1 visual aspect ratio regardless of screen shape
+    // ScaleY is base (1.0), ScaleX must be adjusted by aspect to cancel camera stretch
+    textPlane.scale.y = 1.0;
+    textPlane.scale.x = textPlane.scale.y / aspect;
+}
+
+// Initial call
+updateTextScale();
 
 // Animation
 let targetProgress = 0;
@@ -333,6 +396,13 @@ function updateUI() {
         foregroundMaterial.opacity = 0;
     }
 
+    // Toggle DIRESS Text Plane - Show in Scene 1, 2, 3 (hidden in Scene 0)
+    if (currentScene > 0 && currentScene < 4 && currentStep === 0) {
+        textPlane.visible = true;
+    } else {
+        textPlane.visible = false;
+    }
+
     if (currentStep > 0 || currentScene > 0) {
         scrollIndicator.classList.add('hidden');
     } else {
@@ -415,5 +485,8 @@ window.addEventListener('wheel', (e) => {
         setTimeout(() => isScrolling = false, 800);
     }
 });
+
+
+
 
 
