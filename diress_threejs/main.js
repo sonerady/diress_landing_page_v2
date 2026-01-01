@@ -693,3 +693,71 @@ function startAutoHoverAnimation() {
 // Start animation when page loads
 startAutoHoverAnimation();
 
+// Ecommerce Loading Animation
+let isEcommerceAnimating = false;
+
+function playEcommerceLoadingAnimation() {
+    if (isEcommerceAnimating) return;
+    isEcommerceAnimating = true;
+
+    const loadingOverlay = document.getElementById('ecommerce-loading');
+    const promptText = document.getElementById('prompt-text');
+    const generateBtn = document.getElementById('generate-btn');
+    const spinner = document.getElementById('loading-spinner');
+    const content = document.getElementById('ecommerce-content');
+
+    const text = "E-ticaret için gerekli görselleri üret";
+    let index = 0;
+
+    // Reset state for every playback
+    promptText.textContent = '';
+    generateBtn.style.display = 'inline-flex'; // Reset display from none
+    generateBtn.classList.remove('visible', 'clicked');
+    spinner.classList.remove('visible');
+    content.classList.remove('visible');
+    loadingOverlay.classList.remove('hidden');
+
+    // Typing animation
+    function typeText() {
+        if (index < text.length) {
+            promptText.textContent += text[index];
+            index++;
+            setTimeout(typeText, 50);
+        } else {
+            // Show generate button after typing
+            setTimeout(() => {
+                generateBtn.classList.add('visible');
+
+                // Auto-click button after 500ms
+                setTimeout(() => {
+                    generateBtn.classList.add('clicked');
+
+                    // Show spinner after button click
+                    setTimeout(() => {
+                        generateBtn.style.display = 'none';
+                        spinner.classList.add('visible');
+
+                        // After 3 seconds, hide loading and show content
+                        setTimeout(() => {
+                            loadingOverlay.classList.add('hidden');
+                            content.classList.add('visible');
+                            isEcommerceAnimating = false; // Allow next animation
+                        }, 3000);
+                    }, 300);
+                }, 500);
+            }, 300);
+        }
+    }
+
+    // Start typing after a short delay
+    setTimeout(typeText, 500);
+}
+
+// Watch for step changes to trigger animation
+const originalUpdateUI = updateUI;
+updateUI = function () {
+    originalUpdateUI();
+    if (currentStep === 2) {
+        playEcommerceLoadingAnimation();
+    }
+};

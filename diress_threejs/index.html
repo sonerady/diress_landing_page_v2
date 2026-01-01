@@ -92,7 +92,30 @@
 
         <!-- Ecommerce Kits Section (Step 2) -->
         <div class="ecommerce-section">
-          <div class="ecommerce-container">
+          <!-- Loading Intro -->
+          <div class="ecommerce-loading" id="ecommerce-loading">
+            <div class="loading-layout">
+              <div class="loading-content">
+                <div class="prompt-box">
+                  <span class="prompt-text" id="prompt-text"></span><span class="cursor-blink">|</span>
+                </div>
+                <button class="generate-btn" id="generate-btn">
+                  <i class="fas fa-magic"></i>
+                  Generate
+                </button>
+                <div class="loading-spinner" id="loading-spinner">
+                  <div class="spinner"></div>
+                  <span>Creating your e-commerce visuals...</span>
+                </div>
+              </div>
+              <div class="loading-image">
+                <img src="/assets/center_image.png" alt="Reference">
+              </div>
+            </div>
+          </div>
+
+          <!-- Actual Product Content -->
+          <div class="ecommerce-container" id="ecommerce-content">
             <!-- Product Gallery -->
             <div class="product-gallery">
               <div class="product-main-image">
