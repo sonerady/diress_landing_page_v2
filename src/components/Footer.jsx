@@ -1,18 +1,7 @@
 import React, { useState } from 'react';
 import './Footer.css';
 
-const Footer = ({ translations, lang, setLang }) => {
-    const [currentStep, setCurrentStep] = useState(0);
-
-    const steps = [
-        'Upload',
-        'Select',
-        'Adjust',
-        'Generate',
-        'Refine',
-        'Export',
-        'Share'
-    ];
+const Footer = ({ translations, lang, setLang, currentStep, setCurrentStep, steps }) => {
 
     return (
         <>
@@ -24,12 +13,16 @@ const Footer = ({ translations, lang, setLang }) => {
                             <div
                                 className={`step-item ${currentStep === index ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}
                                 onClick={() => setCurrentStep(index)}
+                                style={{ animationDelay: `${index * 0.1}s` }}
                             >
                                 <span className="step-dot"></span>
                                 <span className="step-label">{label}</span>
                             </div>
                             {index < steps.length - 1 && (
-                                <div className={`step-line ${index < currentStep ? 'completed' : ''}`}></div>
+                                <div
+                                    className={`step-line ${index < currentStep ? 'completed' : ''}`}
+                                    style={{ animationDelay: `${index * 0.1 + 0.05}s` }}
+                                ></div>
                             )}
                         </React.Fragment>
                     ))}
@@ -47,20 +40,39 @@ const Footer = ({ translations, lang, setLang }) => {
                     <a href="/terms" className="legal-link">Terms of Service</a>
                 </div>
 
-                <div className="lang-switch">
-                    <span
-                        onClick={() => setLang('en')}
-                        className={lang === 'en' ? 'active-lang' : ''}
-                    >
-                        EN
-                    </span>
-                    <span className="separator">/</span>
-                    <span
-                        onClick={() => setLang('tr')}
-                        className={lang === 'tr' ? 'active-lang' : ''}
-                    >
-                        TR
-                    </span>
+                <div className="footer-right">
+                    {/* <div className="lang-switch">
+                        <span
+                            onClick={() => setLang('en')}
+                            className={lang === 'en' ? 'active-lang' : ''}
+                        >
+                            EN
+                        </span>
+                        <span className="separator">/</span>
+                        <span
+                            onClick={() => setLang('tr')}
+                            className={lang === 'tr' ? 'active-lang' : ''}
+                        >
+                            TR
+                        </span>
+                    </div> */}
+
+                    <div className="store-badges">
+                        <a href="#" className="store-btn">
+                            <i className="fab fa-apple"></i>
+                            <div className="btn-text">
+                                <span>Download on the</span>
+                                <strong>App Store</strong>
+                            </div>
+                        </a>
+                        <a href="#" className="store-btn">
+                            <i className="fab fa-google-play"></i>
+                            <div className="btn-text">
+                                <span>GET IT ON</span>
+                                <strong>Google Play</strong>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </footer>
         </>

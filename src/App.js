@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Spotlight from './components/Spotlight';
+
 import HomeSection from './sections/HomeSection';
 import AboutSection from './sections/AboutSection';
 import ContactSection from './sections/ContactSection';
@@ -60,8 +60,131 @@ const translations = {
 
 const MainContent = ({ lang, setLang }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [currentStep, setCurrentStep] = useState(0);
+    const [currentScene, setCurrentScene] = useState(0);
+    const isScrollingRef = useRef(false);
+    const touchStartRef = useRef(0);
     const location = useLocation();
     const totalPages = 3;
+    const steps = [
+        'Select Scene',
+        'Ecommerce Kits',
+        'Customize Model',
+        'Retouch',
+        'Change Color',
+        'Change Pose',
+        'Image to Video'
+    ];
+    const totalSteps = steps.length;
+
+    // Intro animation sequence for steps
+    useEffect(() => {
+        const runIntro = async () => {
+            // Wait for initial CSS staggered animation to finish
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // Cycle through each step quickly
+            for (let i = 0; i < totalSteps; i++) {
+                setCurrentStep(i);
+                await new Promise(resolve => setTimeout(resolve, 100)); // Quick 100ms per step
+            }
+
+            // Reset to first step
+            setTimeout(() => {
+                setCurrentStep(0);
+            }, 300);
+        };
+
+        runIntro();
+    }, [totalSteps]);
+
+    // Handle wheel scroll for vertical steps and scenes
+    useEffect(() => {
+        const handleWheel = (e) => {
+            e.preventDefault();
+            if (isScrollingRef.current) return;
+
+            if (Math.abs(e.deltaY) > 15) {
+                isScrollingRef.current = true;
+
+                if (e.deltaY > 0) {
+                    // Scrolling Down
+                    if (currentStep === 0 && currentScene < 2) {
+                        setCurrentScene(prev => prev + 1);
+                    } else {
+                        setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1));
+                    }
+                } else {
+                    // Scrolling Up
+                    if (currentStep === 1) {
+                        setCurrentStep(0);
+                        setCurrentScene(2);
+                    } else if (currentStep === 0 && currentScene > 0) {
+                        setCurrentScene(prev => prev - 1);
+                    } else {
+                        setCurrentStep(prev => Math.max(prev - 1, 0));
+                    }
+                }
+
+                setTimeout(() => {
+                    isScrollingRef.current = false;
+                }, 600);
+            }
+        };
+
+        const handleTouchStart = (e) => {
+            touchStartRef.current = e.touches[0].clientY;
+        };
+
+        const handleTouchMove = (e) => {
+            if (isScrollingRef.current) {
+                e.preventDefault();
+                return;
+            }
+            const touchEnd = e.touches[0].clientY;
+            const diff = touchStartRef.current - touchEnd;
+
+            if (Math.abs(diff) > 25) {
+                e.preventDefault();
+                isScrollingRef.current = true;
+
+                if (diff > 0) {
+                    // Swipe Up (Scroll Down)
+                    if (currentStep === 0 && currentScene < 2) {
+                        setCurrentScene(prev => prev + 1);
+                    } else {
+                        setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1));
+                    }
+                } else {
+                    // Swipe Down (Scroll Up)
+                    if (currentStep === 1) {
+                        setCurrentStep(0);
+                        setCurrentScene(2);
+                    } else if (currentStep === 0 && currentScene > 0) {
+                        setCurrentScene(prev => prev - 1);
+                    } else {
+                        setCurrentStep(prev => Math.max(prev - 1, 0));
+                    }
+                }
+
+                touchStartRef.current = touchEnd;
+                setTimeout(() => {
+                    isScrollingRef.current = false;
+                }, 600);
+            }
+        };
+
+        // Use passive: false to allow preventDefault
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        window.addEventListener('touchstart', handleTouchStart, { passive: false });
+        window.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+        return () => {
+            window.removeEventListener('wheel', handleWheel);
+            window.removeEventListener('touchstart', handleTouchStart);
+            window.removeEventListener('touchmove', handleTouchMove);
+        };
+    }, [totalSteps, currentStep, currentScene]);
 
     // Handle incoming navigation from other pages
     useEffect(() => {
@@ -79,8 +202,8 @@ const MainContent = ({ lang, setLang }) => {
 
     return (
         <>
-            <div className="main-container">
-                <Spotlight active={currentSlide === 0} />
+            <div className={`main-container step-${currentStep} scene-${currentScene}`}>
+
 
                 <Header
                     currentSlide={currentSlide}
@@ -92,7 +215,7 @@ const MainContent = ({ lang, setLang }) => {
 
                 <main className="content-mask">
                     <div className="slider-track" style={sliderStyle}>
-                        <HomeSection translations={translations} lang={lang} />
+                        <HomeSection translations={translations} lang={lang} currentScene={currentScene} />
                         <AboutSection translations={translations} lang={lang} />
                         <ContactSection translations={translations} lang={lang} />
                     </div>
@@ -116,13 +239,16 @@ const MainContent = ({ lang, setLang }) => {
                     currentSlide={currentSlide}
                     setSlide={setCurrentSlide}
                     totalPages={totalPages}
+                    currentStep={currentStep}
+                    setCurrentStep={setCurrentStep}
+                    steps={steps}
                     translations={translations}
                     lang={lang}
                     setLang={setLang}
                 />
 
-                {/* Scroll Indicator */}
-                <div className="scroll-indicator">
+                {/* Scroll Indicator - Hidden after first scroll (step 0, scene 0) */}
+                <div className={`scroll-indicator ${(currentStep > 0 || currentScene > 0) ? 'hidden' : ''}`}>
                     <div className="mouse"></div>
                     <span>Scroll</span>
                 </div>

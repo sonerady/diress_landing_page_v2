@@ -7,7 +7,8 @@
 
 html,
 body {
-  overflow: auto;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
@@ -16,6 +17,7 @@ body {
   width: 100vw;
   background-color: #fff;
   position: relative;
+  touch-action: none;
 }
 
 /* --- Main Container --- */
@@ -23,14 +25,48 @@ body {
   width: calc(100vw - 60px);
   height: calc(100vh - 60px);
   margin: 30px;
-  display: grid;
-  grid-template-rows: 80px 1fr;
+  display: block;
+  /* Removed grid to allow absolute positioning of header */
   overflow: hidden;
-  background: #fff;
+  background: transparent;
+  /* Changed from #fff to transparent */
   border-radius: 20px;
   border: 5px solid rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 1;
+  touch-action: none;
+}
+
+.main-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.4) 40%,
+      rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 15px 15px 0 0;
+  transition: all 0.5s ease;
+}
+
+/* Specific Scene Gradients */
+.main-container.step-0.scene-0::before {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.main-container.step-0.scene-1::before {
+  background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.3) 40%,
+      rgba(0, 0, 0, 0) 100%);
+  opacity: 1;
+  visibility: visible;
 }
 
 .main-container::after {
@@ -39,15 +75,87 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 100px;
+  height: 120px;
   background: linear-gradient(to top,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0.8) 30%,
-      rgba(255, 255, 255, 0.4) 60%,
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 0.4) 40%,
       rgba(255, 255, 255, 0) 100%);
   pointer-events: none;
   z-index: 3;
   border-radius: 0 0 15px 15px;
+  transition: all 0.5s ease;
+}
+
+.main-container.step-0.scene-1::after {
+  background: linear-gradient(to top,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.3) 40%,
+      rgba(0, 0, 0, 0) 100%);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Header Contrast for Dark Scene */
+.main-container.step-0.scene-1 .logo-text {
+  color: #fff;
+}
+
+.main-container.step-0.scene-1 nav a {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.main-container.step-0.scene-1 nav a.active,
+.main-container.step-0.scene-1 nav a:hover {
+  color: #fff;
+}
+
+/* Footer Contrast for Dark Scene */
+.main-container.step-0.scene-1 .socials i,
+.main-container.step-0.scene-1 .legal-link {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.main-container.step-0.scene-1 .socials i:hover,
+.main-container.step-0.scene-1 .legal-link:hover {
+  color: #fff;
+}
+
+.main-container.step-0.scene-1 .legal-separator {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.main-container.step-0.scene-1 .lang-switch {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.main-container.step-0.scene-1 .lang-switch span.active-lang {
+  color: #fff;
+}
+
+.main-container.step-0.scene-1 .vertical-slider-container {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: transparent;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.main-container.step-0.scene-1 .vertical-slider-container .step-item .step-label {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.main-container.step-0.scene-1 .vertical-slider-container .step-item.active .step-label {
+  color: #fff;
+}
+
+.main-container.step-0.scene-1 .vertical-slider-container .step-dot {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.main-container.step-0.scene-1 .vertical-slider-container .step-item.active .step-dot {
+  background: #fff;
+}
+
+.main-container.step-0.scene-1 .vertical-slider-container .step-line {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Scroll Indicator */
@@ -56,12 +164,18 @@ body {
   right: 60px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  cursor: pointer;
+  z-index: 100;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.scroll-indicator.hidden {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .scroll-indicator .mouse {
@@ -124,7 +238,8 @@ body {
 .page-section {
   width: 33.333%;
   height: 100%;
-  padding: 0 20px;
+  padding: 0;
+  /* Removed padding for full screen images */
 }
 
 /* --- Responsive Design --- */
@@ -159,8 +274,7 @@ body {
     margin: 15px;
     border-radius: 20px;
     border: 5px solid rgba(0, 0, 0, 0.05);
-    grid-template-rows: 60px 1fr 0px;
-    /* Footer hidden */
+    display: block;
   }
 
   .mobile-nav-arrow {
