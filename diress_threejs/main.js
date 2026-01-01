@@ -628,14 +628,31 @@ window.addEventListener('wheel', (e) => {
     if (Math.abs(e.deltaY) > 15) {
         isScrolling = true;
         if (e.deltaY > 0) {
-            // Scroll down: go to next scene (up to Scene 4)
-            if (currentStep === 0 && currentScene < 4) transitionToScene(currentScene + 1);
-            else { currentStep = Math.min(currentStep + 1, steps.length - 1); updateUI(); }
+            // Scroll down
+            if (currentStep === 0 && currentScene < 3) {
+                // Go through scenes 0->1->2->3
+                transitionToScene(currentScene + 1);
+            } else if (currentStep === 0 && currentScene === 3) {
+                // From Scene 3, go to Ecommerce Kits (step 2)
+                currentStep = 2;
+                updateUI();
+            } else {
+                // Continue to next steps
+                currentStep = Math.min(currentStep + 1, steps.length - 1);
+                updateUI();
+            }
         } else {
-            // Scroll up: go to previous scene
-            if (currentStep === 0 && currentScene > 0) transitionToScene(currentScene - 1);
-            else if (currentStep === 1) { currentStep = 0; transitionToScene(4); }
-            else { currentStep = Math.max(currentStep - 1, 0); updateUI(); }
+            // Scroll up
+            if (currentStep === 2 && currentScene === 3) {
+                // From Ecommerce Kits, go back to Scene 3
+                currentStep = 0;
+                updateUI();
+            } else if (currentStep === 0 && currentScene > 0) {
+                transitionToScene(currentScene - 1);
+            } else {
+                currentStep = Math.max(currentStep - 1, 0);
+                updateUI();
+            }
         }
         setTimeout(() => isScrolling = false, 800);
     }
