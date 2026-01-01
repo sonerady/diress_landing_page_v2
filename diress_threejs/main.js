@@ -131,6 +131,15 @@ videoElement2.playsInline = true;
 videoElement2.crossOrigin = 'anonymous';
 videoElement2.load();
 
+// Video element for Scene 3
+const videoElement3 = document.createElement('video');
+videoElement3.src = '/assets/center_image_scene_3.mp4';
+videoElement3.loop = true;
+videoElement3.muted = true;
+videoElement3.playsInline = true;
+videoElement3.crossOrigin = 'anonymous';
+videoElement3.load();
+
 // Create VideoTextures
 const videoTexture1 = new THREE.VideoTexture(videoElement1);
 videoTexture1.minFilter = THREE.LinearFilter;
@@ -144,12 +153,20 @@ videoTexture2.magFilter = THREE.LinearFilter;
 videoTexture2.format = THREE.RGBAFormat;
 videoTexture2.generateMipmaps = false;
 
-// Load textures - Scene 1 and 2 use video, others use images
+const videoTexture3 = new THREE.VideoTexture(videoElement3);
+videoTexture3.minFilter = THREE.LinearFilter;
+videoTexture3.magFilter = THREE.LinearFilter;
+videoTexture3.format = THREE.RGBAFormat;
+videoTexture3.generateMipmaps = false;
+
+// Load textures - Scene 1, 2, 3 use video, others use images
 const textures = scenes.map((url, index) => {
     if (index === 1) {
         return videoTexture1;
     } else if (index === 2) {
         return videoTexture2;
+    } else if (index === 3) {
+        return videoTexture3;
     } else {
         return loader.load(url, (tex) => {
             tex.minFilter = THREE.LinearFilter;
@@ -485,16 +502,23 @@ function transitionToScene(index) {
         foregroundMaterial.opacity = 0;
     }
 
-    // Video playback control for Scene 1 and Scene 2
+    // Video playback control for Scene 1, 2, and 3
     if (index === 1) {
         videoElement1.play().catch(e => console.log('Video 1 autoplay blocked:', e));
         videoElement2.pause();
+        videoElement3.pause();
     } else if (index === 2) {
         videoElement2.play().catch(e => console.log('Video 2 autoplay blocked:', e));
         videoElement1.pause();
+        videoElement3.pause();
+    } else if (index === 3) {
+        videoElement3.play().catch(e => console.log('Video 3 autoplay blocked:', e));
+        videoElement1.pause();
+        videoElement2.pause();
     } else {
         videoElement1.pause();
         videoElement2.pause();
+        videoElement3.pause();
     }
 
     updateUI();

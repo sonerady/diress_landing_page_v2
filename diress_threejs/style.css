@@ -94,8 +94,8 @@ body {
 .main-container.step-0.scene-2::after,
 .main-container.step-0.scene-3::after {
     background: linear-gradient(to top,
-            rgba(0, 0, 0, 0.6) 0%,
-            rgba(0, 0, 0, 0.3) 40%,
+            rgba(0, 0, 0, 0.85) 0%,
+            rgba(0, 0, 0, 0.5) 40%,
             rgba(0, 0, 0, 0) 100%);
     opacity: 1;
     visibility: visible;
@@ -390,7 +390,283 @@ body {
     background: linear-gradient(to top, rgba(220, 53, 69, 0.85) 0%, rgba(220, 53, 69, 0.5) 60%, transparent 100%);
 }
 
-/* Scene Text Container - Holds selector and text */
+/* ========================
+   ECOMMERCE SECTION STYLES
+   ======================== */
+.ecommerce-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    z-index: 85;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.main-container.step-2 .ecommerce-section {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ecommerce-container {
+    display: flex;
+    gap: 60px;
+    max-width: 1200px;
+    width: 90%;
+    align-items: flex-start;
+    padding: 40px;
+}
+
+/* Product Gallery */
+.product-gallery {
+    flex: 1;
+    max-width: 550px;
+    display: flex;
+    gap: 16px;
+}
+
+.product-main-image {
+    width: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.product-main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-thumbnails {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    order: -1;
+}
+
+.product-thumbnails .thumb {
+    width: 80px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.product-thumbnails .thumb:hover,
+.product-thumbnails .thumb.active {
+    opacity: 1;
+    border-color: #1a1a1a;
+}
+
+.product-thumbnails .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Product Info */
+.product-info {
+    flex: 1;
+    max-width: 450px;
+}
+
+.product-badge {
+    display: inline-block;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+.product-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+}
+
+.product-code {
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0 0 20px 0;
+}
+
+.product-price {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.current-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.original-price {
+    font-size: 1.2rem;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.option-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Color Options */
+.product-colors {
+    margin-bottom: 24px;
+}
+
+.color-options {
+    display: flex;
+    gap: 10px;
+}
+
+.color-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+}
+
+.color-swatch.active {
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.2);
+}
+
+/* Size Options */
+.product-sizes {
+    margin-bottom: 30px;
+}
+
+.size-options {
+    display: flex;
+    gap: 10px;
+}
+
+.size-btn {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.size-btn:hover {
+    border-color: #1a1a1a;
+    color: #1a1a1a;
+}
+
+.size-btn.active {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+    color: #fff;
+}
+
+/* Action Buttons */
+.product-actions {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.btn-add-cart,
+.btn-buy-now {
+    flex: 1;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-add-cart {
+    background: #fff;
+    border: 2px solid #1a1a1a;
+    color: #1a1a1a;
+}
+
+.btn-add-cart:hover {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.btn-buy-now {
+    background: #1a1a1a;
+    border: 2px solid #1a1a1a;
+    color: #fff;
+}
+
+.btn-buy-now:hover {
+    background: #333;
+}
+
+/* Product Features */
+.product-features {
+    display: flex;
+    gap: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.product-features .feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.product-features .feature i {
+    color: #1a1a1a;
+}
+
 .scene-text-container {
     position: absolute;
     top: 50%;
