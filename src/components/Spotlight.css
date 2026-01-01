@@ -31,5 +31,4 @@ nav a.spotlight-active,
 .legal-link.spotlight-active {
     color: #fff !important;
     font-weight: 700 !important;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }

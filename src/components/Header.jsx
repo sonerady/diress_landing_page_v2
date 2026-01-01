@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
+import logoIcon from '../icon.png';
 
 const Header = ({ currentSlide, setSlide, lang, setLang, translations }) => {
     const t = translations[lang];
@@ -19,7 +20,8 @@ const Header = ({ currentSlide, setSlide, lang, setLang, translations }) => {
     return (
         <header>
             <div className="logo">
-                Lab<span className="dot">.</span>
+                <img src={logoIcon} alt="Logo" className="logo-icon" />
+                diress<span className="dot">.</span>
             </div>
             <nav>
                 <ul>
@@ -50,21 +52,24 @@ const Header = ({ currentSlide, setSlide, lang, setLang, translations }) => {
                             {t.contacts}
                         </a>
                     </li>
+                    <li>
+                        <a
+                            href="/pricing"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                navigate('/pricing');
+                            }}
+                            className={location.pathname === '/pricing' ? 'active' : ''}
+                        >
+                            {t.pricing || 'Pricing'}
+                        </a>
+                    </li>
                 </ul>
             </nav>
-            <div className="lang-switch">
-                <span
-                    onClick={() => setLang('en')}
-                    className={lang === 'en' ? 'active-lang' : ''}
-                >
-                    EN
-                </span> /
-                <span
-                    onClick={() => setLang('tr')}
-                    className={lang === 'tr' ? 'active-lang' : ''}
-                >
-                    TR
-                </span>
+            <div className="header-right">
+                <button className="get-started-btn">
+                    {t.getStarted}
+                </button>
             </div>
         </header>
     );

@@ -10,6 +10,7 @@ import PrivacyPolicy from './PrivacyPolicy';
 import TermsOfService from './TermsOfService';
 import MannequinTips from './MannequinTips';
 import RedirectToApp from './components/RedirectToApp';
+import Pricing from './Pricing';
 import './styles/global.css';
 
 const translations = {
@@ -17,6 +18,7 @@ const translations = {
         home: "Home",
         about: "About",
         contacts: "Contacts",
+        pricing: "Pricing",
         artist: "Crafting Intelligent Solutions with AI",
         aboutTitle: "About The Atelier",
         aboutDesc: "Monailisa Lab is an AI-focused software company that develops cutting-edge applications powered by artificial intelligence. While we create custom solutions for other businesses, our true passion lies in our own AI-driven products.",
@@ -27,6 +29,7 @@ const translations = {
         est: "EST. MMXXIV",
         nextPage: "NEXT PAGE",
         prevPage: "PREV PAGE",
+        getStarted: "GET STARTED",
         diressDesc: "AI Mannequin Dressing App.",
         wearupDesc: "AI outfit combinations.",
         producterDesc: "AI product photography.",
@@ -36,6 +39,7 @@ const translations = {
         home: "Anasayfa",
         about: "Hakkında",
         contacts: "İletişim",
+        pricing: "Fiyatlar",
         artist: "Yapay Zeka ile Akıllı Çözümler Üretiyoruz",
         aboutTitle: "Atölye Hakkında",
         aboutDesc: "Monailisa Lab, yapay zeka odaklı bir yazılım şirketidir ve yapay zeka ile güçlendirilmiş son teknoloji uygulamalar geliştirmektedir. Diğer işletmeler için özel çözümler üretirken, asıl tutkumuz kendi yapay zeka destekli ürünlerimizdir.",
@@ -46,6 +50,7 @@ const translations = {
         est: "KURULUŞ: 2024",
         nextPage: "SONRAKİ",
         prevPage: "ÖNCEKİ",
+        getStarted: "BAŞLA",
         diressDesc: "AI Manken Giydirme Uygulaması.",
         wearupDesc: "AI kıyafet kombinleri.",
         producterDesc: "AI ürün fotoğrafçılığı.",
@@ -113,7 +118,14 @@ const MainContent = ({ lang, setLang }) => {
                     totalPages={totalPages}
                     translations={translations}
                     lang={lang}
+                    setLang={setLang}
                 />
+
+                {/* Scroll Indicator */}
+                <div className="scroll-indicator">
+                    <div className="mouse"></div>
+                    <span>Scroll</span>
+                </div>
             </div>
             {/* Mobile Legal Links */}
             <div className="mobile-legal-links">
@@ -147,6 +159,10 @@ const App = () => {
                 <Route
                     path="/diress-app"
                     element={<RedirectToApp />}
+                />
+                <Route
+                    path="/pricing"
+                    element={<Pricing translations={translations} lang={lang} setLang={setLang} />}
                 />
                 {/* Add other routes if needed */}
             </Routes>

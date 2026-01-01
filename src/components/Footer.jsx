@@ -1,58 +1,69 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Footer.css';
 
-const Footer = ({ currentSlide, setSlide, totalPages, translations, lang }) => {
-    const t = translations[lang];
+const Footer = ({ translations, lang, setLang }) => {
+    const [currentStep, setCurrentStep] = useState(0);
 
-    const nextSlide = () => {
-        let next = currentSlide + 1;
-        if (next >= totalPages) next = 0;
-        setSlide(next);
-    };
-
-    const prevSlide = () => {
-        if (currentSlide > 0) {
-            setSlide(currentSlide - 1);
-        }
-    };
+    const steps = [
+        'Upload',
+        'Select',
+        'Adjust',
+        'Generate',
+        'Refine',
+        'Export',
+        'Share'
+    ];
 
     return (
-        <footer>
-            <div className="socials">
-                <i className="fab fa-instagram"></i>
-                <i className="fab fa-twitter"></i>
-                <i className="fab fa-linkedin-in"></i>
-                {/* Legal Links */}
-                <a href="/privacy-policy" className="legal-link">Privacy Policy</a>
-                <span className="legal-separator">|</span>
-                <a href="/terms" className="legal-link">Terms of Service</a>
-            </div>
-
-            {/* Pagination Area */}
-            <div className="pagination-container">
-                {/* PREV BUTTON */}
-                <div
-                    className={`prev-page-btn ${currentSlide > 0 ? 'visible' : ''}`}
-                    id="prevBtn"
-                    onClick={prevSlide}
-                >
-                    <i className="fas fa-chevron-left"></i>
-                    <span>{t.prevPage}</span>
-                </div>
-
-                {/* PAGE NUMBER */}
-                <div className="page-number">
-                    <span className="big-num" id="page-indicator">0{currentSlide + 1}</span>
-                    <span className="small-num">0{totalPages}</span>
-                </div>
-
-                {/* NEXT BUTTON */}
-                <div className="next-page-btn" onClick={nextSlide}>
-                    <span>{t.nextPage}</span>
-                    <i className="fas fa-chevron-right"></i>
+        <>
+            {/* Vertical Step Slider on Left */}
+            <div className="vertical-slider-container">
+                <div className="vertical-slider">
+                    {steps.map((label, index) => (
+                        <React.Fragment key={index}>
+                            <div
+                                className={`step-item ${currentStep === index ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}
+                                onClick={() => setCurrentStep(index)}
+                            >
+                                <span className="step-dot"></span>
+                                <span className="step-label">{label}</span>
+                            </div>
+                            {index < steps.length - 1 && (
+                                <div className={`step-line ${index < currentStep ? 'completed' : ''}`}></div>
+                            )}
+                        </React.Fragment>
+                    ))}
                 </div>
             </div>
-        </footer>
+
+            {/* Footer */}
+            <footer>
+                <div className="socials">
+                    <i className="fab fa-instagram"></i>
+                    <i className="fab fa-twitter"></i>
+                    <i className="fab fa-linkedin-in"></i>
+                    <a href="/privacy-policy" className="legal-link">Privacy Policy</a>
+                    <span className="legal-separator">|</span>
+                    <a href="/terms" className="legal-link">Terms of Service</a>
+                </div>
+
+                <div className="lang-switch">
+                    <span
+                        onClick={() => setLang('en')}
+                        className={lang === 'en' ? 'active-lang' : ''}
+                    >
+                        EN
+                    </span>
+                    <span className="separator">/</span>
+                    <span
+                        onClick={() => setLang('tr')}
+                        className={lang === 'tr' ? 'active-lang' : ''}
+                    >
+                        TR
+                    </span>
+                </div>
+            </footer>
+        </>
     );
 };
 

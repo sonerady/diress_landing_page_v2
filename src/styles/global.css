@@ -7,7 +7,7 @@
 
 html,
 body {
-  overflow: hidden;
+  overflow: auto;
 }
 
 body {
@@ -24,13 +24,86 @@ body {
   height: calc(100vh - 60px);
   margin: 30px;
   display: grid;
-  grid-template-rows: 80px 1fr 80px;
+  grid-template-rows: 80px 1fr;
   overflow: hidden;
   background: #fff;
   border-radius: 20px;
   border: 5px solid rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 1;
+}
+
+.main-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.8) 30%,
+      rgba(255, 255, 255, 0.4) 60%,
+      rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  z-index: 3;
+  border-radius: 0 0 15px 15px;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: fixed;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.scroll-indicator .mouse {
+  width: 48px;
+  height: 80px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 24px;
+  position: relative;
+}
+
+.scroll-indicator .mouse::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  animation: scrollAnimation 1.5s ease-in-out infinite;
+}
+
+@keyframes scrollAnimation {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    opacity: 0.3;
+    transform: translateX(-50%) translateY(24px);
+  }
+}
+
+.scroll-indicator span {
+  font-size: 0.6rem;
+  color: rgba(0, 0, 0, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* --- Slide Wrapper --- */
@@ -62,6 +135,15 @@ body {
     width: calc(100vw - 40px);
     height: calc(100vh - 40px);
     margin: 20px;
+  }
+
+  .scroll-indicator {
+    right: 40px;
+  }
+
+  .scroll-indicator .mouse {
+    width: 26px;
+    height: 44px;
   }
 }
 
