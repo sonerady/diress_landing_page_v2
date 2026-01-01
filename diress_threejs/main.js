@@ -302,6 +302,7 @@ gradientPlane.position.z = 0.02; // BEHIND Text (0.05) and FG (0.1), but FRONT o
 const textPlane = new THREE.Mesh(textGeometry, textMaterial);
 textPlane.position.z = 0.05; // FRONT of Gradient (0.02)
 textPlane.position.y = 0.65; // Moved even further up
+textPlane.position.x = 0.02; // Slightly to the right
 textPlane.scale.set(0.8, 1.1, 1); // Stretched Y to fix squashed look
 scene.add(textPlane);
 
@@ -430,7 +431,7 @@ function animate() {
         // DIRESS Text Parallax (Opposite direction, lighter)
         if (textPlane) {
             const textParallaxFactor = -0.02; // Opposite direction
-            textPlane.position.x = smoothedMouse.x * textParallaxFactor;
+            textPlane.position.x = 0.02 + (smoothedMouse.x * textParallaxFactor);
             textPlane.position.y = 0.65 + (smoothedMouse.y * textParallaxFactor);
         }
     } else {
@@ -441,7 +442,7 @@ function animate() {
         foregroundPlane.position.y = 0;
 
         if (textPlane) {
-            textPlane.position.x = 0;
+            textPlane.position.x = 0.02;
             textPlane.position.y = 0.65;
         }
         // Also reset smoothed values so next time it starts from center
@@ -512,26 +513,14 @@ function updateUI() {
     }
 
     // Toggle DIRESS Text Plane and Gradient Plane
-    if (currentStep === 0) {
-        // Show in all Scenes (0, 1, 2, 3) if in Step 0
+    if (currentStep === 0 && currentScene > 0) {
+        // Show only in Scenes 1, 2, 3 (not Scene 0)
         textPlane.visible = true;
-
-        if (currentScene === 0) {
-            // Scene 0: Black text, placed BEHIND the main background image
-            textPlane.material.color.setHex(0xeeeeee);
-            textPlane.position.z = -1.0;
-            textPlane.renderOrder = -1; // Force draw earlier
-        } else {
-            // Other Scenes: White text, placed IN FRONT of background/gradient
-            textPlane.material.color.setHex(0xffffff);
-            textPlane.position.z = 0.05;
-            textPlane.renderOrder = 1; // Default/Front
-        }
-
-        // gradientPlane.visible = true; // Still disabled
+        textPlane.material.color.setHex(0xffffff);
+        textPlane.position.z = 0.05;
+        textPlane.renderOrder = 1;
     } else {
         textPlane.visible = false;
-        // gradientPlane.visible = false;
     }
 
     if (currentStep > 0 || currentScene > 0) {
@@ -628,7 +617,38 @@ window.addEventListener('wheel', (e) => {
     }
 });
 
+// Auto-hover animation for model cards on page load
+function startAutoHoverAnimation() {
+    const gridCards = document.querySelectorAll('.grid-card');
+    if (gridCards.length === 0) return;
 
+    let currentIndex = 0;
+    const animationDuration = 300; // ms per card
 
+    function animateNext() {
+        // Remove from all
+        gridCards.forEach(card => card.classList.remove('auto-hovered'));
 
+        // Add to current
+        gridCards[currentIndex].classList.add('auto-hovered');
+
+        currentIndex++;
+
+        // Stop after one full cycle
+        if (currentIndex < gridCards.length) {
+            setTimeout(animateNext, animationDuration);
+        } else {
+            // Remove class from last card after animation
+            setTimeout(() => {
+                gridCards.forEach(card => card.classList.remove('auto-hovered'));
+            }, animationDuration);
+        }
+    }
+
+    // Start after a short delay
+    setTimeout(animateNext, 500);
+}
+
+// Start animation when page loads
+startAutoHoverAnimation();
 
