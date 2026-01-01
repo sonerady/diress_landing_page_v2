@@ -341,14 +341,7 @@ function updateUI() {
     renderSteps();
     updateSceneSelector();
 
-    // Explicitly handle magnifier visibility
-    if (currentScene === 0 && currentStep === 0) {
-        magnifier.style.backgroundImage = `url(${scenes[currentScene]})`;
-        // We don't force display block here, as it depends on mouse position,
-        // but we ensure the image is correct for when it IS shown.
-    } else {
-        magnifier.style.display = 'none';
-    }
+
 }
 
 // Scene Selector - Update active thumbnail
@@ -423,25 +416,4 @@ window.addEventListener('wheel', (e) => {
     }
 });
 
-artWrapper.addEventListener('mousemove', (e) => {
-    // Only enable magnifier for scene 0 (Select Scene) and when not scrolling
-    if (currentScene !== 0 || isScrolling) {
-        magnifier.style.display = 'none';
-        return;
-    }
 
-    const { top, left, width, height } = artWrapper.getBoundingClientRect();
-    const x = e.pageX - left - window.scrollX;
-    const y = e.pageY - top - window.scrollY;
-    const zoom = 3.5, offset = 90;
-
-    if (x > 0 && y > 0 && x < width && y < height) {
-        magnifier.style.display = 'block';
-        magnifier.style.top = `${y - offset}px`;
-        magnifier.style.left = `${x - offset}px`;
-        magnifier.style.backgroundSize = `${width * zoom}px ${height * zoom}px`;
-        magnifier.style.backgroundPosition = `-${x * zoom - offset}px -${y * zoom - offset}px`;
-    } else magnifier.style.display = 'none';
-});
-
-artWrapper.addEventListener('mouseleave', () => magnifier.style.display = 'none');
