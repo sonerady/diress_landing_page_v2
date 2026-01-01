@@ -5,10 +5,20 @@ import * as THREE from 'three'
 let currentScene = 0;
 let currentStep = 0;
 const scenes = [
-    '/assets/center_image_2.png',
-    '/assets/center_image_scene_1.png',
-    '/assets/center_image.png',
-    '/assets/center_image_scene_1_front_people.png' // Scene 1 foreground layer
+    '/assets/center_image_2.png',           // Scene 0 (index 0)
+    '/assets/center_image_scene_1.png',     // Scene 1 (index 1)
+    '/assets/center_image_scene_2.png',     // Scene 2 (index 2)
+    '/assets/center_image_scene_3.png',     // Scene 3 (index 3)
+    '/assets/center_image.png'              // Scene 4 (index 4) - original
+];
+
+// Foreground layers for parallax (Scene 1=1, Scene 2=2, Scene 3=3)
+const foregroundImages = [
+    null,                                                    // Scene 0
+    '/assets/center_image_scene_1_front_people.png',         // Scene 1
+    '/assets/center_image_scene_2_front_people.png',         // Scene 2
+    '/assets/center_image_scene_3_front_people.png',         // Scene 3
+    null                                                     // Scene 4
 ];
 const steps = [
     'Select Scene', 'Ecommerce Kits', 'Customize Model', 'Retouch', 'Change Color', 'Change Pose', 'Image to Video'
@@ -114,31 +124,48 @@ const material = new THREE.ShaderMaterial({
 const plane = new THREE.Mesh(geometry, material);
 scene.add(plane);
 
-// Foreground Plane for Scene 1 Parallax (using textures[3])
+// Foreground Plane for Scene 1 and 2 Parallax
 const foregroundMaterial = new THREE.MeshBasicMaterial({
-    map: null, // Will be set to textures[3] after loading
+    map: null,
     transparent: true,
     opacity: 0, // Start hidden (Scene 0 is default)
     side: THREE.DoubleSide,
     depthTest: false,
-    depthWrite: false
-    // No alphaTest - keep original colors
+    depthWrite: false,
+    blending: THREE.NormalBlending,
+    toneMapped: false
 });
 
-// Set foreground texture after it loads
-setTimeout(() => {
-    if (textures[3]) {
-        foregroundMaterial.map = textures[3];
+// Load all foreground textures
+const foregroundTextures = [];
+foregroundImages.forEach((url, index) => {
+    if (url) {
+        foregroundTextures[index] = loader.load(url, (tex) => {
+            tex.minFilter = THREE.LinearFilter;
+            tex.generateMipmaps = false;
+            tex.colorSpace = THREE.SRGBColorSpace;
+            updateForegroundUVScale(); // Trigger resize when loaded
+            console.log(`✅ Foreground texture ${index} loaded: ${url}`);
+        });
+    } else {
+        foregroundTextures[index] = null;
+    }
+});
+
+// Function to switch foreground texture based on scene
+function updateForegroundTexture() {
+    const fgTexture = foregroundTextures[currentScene];
+    if (fgTexture) {
+        foregroundMaterial.map = fgTexture;
         foregroundMaterial.needsUpdate = true;
-        console.log('✅ Foreground texture set from textures[3]');
         updateForegroundUVScale();
     }
-}, 100);
+}
 
-console.log('🎭 Foreground material initialized (hidden by default)');
+console.log('🎭 Foreground system initialized for multiple scenes');
 
 const foregroundPlane = new THREE.Mesh(geometry, foregroundMaterial);
-foregroundPlane.position.z = 0.1; // In front of main (0), behind camera (5)
+foregroundPlane.position.z = 0.1;
 foregroundPlane.renderOrder = 999;
 scene.add(foregroundPlane);
 console.log('🎭 Foreground plane added at z=0.1');
@@ -164,30 +191,39 @@ function updateAllUVScales() {
 }
 
 function updateForegroundUVScale() {
-    // Match the same UV scaling that the background shader uses
-    const fgTexture = textures[3];
-    if (!fgTexture || !fgTexture.image) return;
+    // Use the currently active foreground texture
+    const fgTexture = foregroundTextures[currentScene];
+
+    // Safety check: ensure texture and image data exist
+    if (!fgTexture || !fgTexture.image || fgTexture.image.width === 0) return;
 
     const screenAspect = artWrapper.clientWidth / artWrapper.clientHeight;
     const imageAspect = fgTexture.image.width / fgTexture.image.height;
 
+    // Calculate Cover Scale (simulating object-fit: cover)
     let scaleX, scaleY;
     if (screenAspect > imageAspect) {
         // Screen is wider than image
+        // To cover, we must stretch width to match screen, and crop height
+        // But in UV space, a smaller scale means "zooming in" / cropping
         scaleX = 1;
         scaleY = imageAspect / screenAspect;
     } else {
         // Screen is taller than image
+        // To cover, we force height to match screen, and crop width
         scaleX = screenAspect / imageAspect;
         scaleY = 1;
     }
 
-    // Apply UV scaling via texture repeat/offset (same as shader's correctedUV)
+    // Apply the UV transform
+    // scaleX/Y here represent "how much of the texture to show"
+    // So 1 means full texture, <1 means cropped (zoomed in)
     fgTexture.repeat.set(scaleX, scaleY);
-    fgTexture.offset.set((1 - scaleX) / 2, (1 - scaleY) / 2);
-    fgTexture.needsUpdate = true;
 
-    // Keep plane at full size (2x2), UV handles the rest
+    // Center the crop
+    fgTexture.offset.set((1 - scaleX) / 2, (1 - scaleY) / 2);
+
+    fgTexture.needsUpdate = true;
     foregroundPlane.scale.set(1, 1, 1);
 }
 
@@ -213,14 +249,15 @@ function animate() {
         uniforms.progress.value = targetProgress;
     }
 
-    // Apply parallax offsets (only visible in Scene 1)
-    if (currentScene === 1 && currentStep === 0) {
+    // Apply parallax offsets for scenes with foreground (Scene 1 and 2)
+    const hasForeground = foregroundImages[currentScene] !== null;
+    if (hasForeground && currentStep === 0) {
         plane.position.x = mouseX * parallaxStrength.background;
         plane.position.y = -mouseY * parallaxStrength.background;
         foregroundPlane.position.x = mouseX * parallaxStrength.foreground;
         foregroundPlane.position.y = -mouseY * parallaxStrength.foreground;
     } else {
-        // Reset positions when not in Scene 1
+        // Reset positions when not in a parallax scene
         plane.position.x = 0;
         plane.position.y = 0;
         foregroundPlane.position.x = 0;
@@ -250,8 +287,10 @@ function transitionToScene(index) {
 
     currentScene = index;
 
-    // Show/hide foreground plane for Scene 1
-    if (currentScene === 1 && currentStep === 0) {
+    // Update foreground texture and show/hide for Scene 1 and 2
+    updateForegroundTexture();
+    const hasForeground = foregroundImages[currentScene] !== null;
+    if (hasForeground && currentStep === 0) {
         foregroundMaterial.opacity = 1;
     } else {
         foregroundMaterial.opacity = 0;
@@ -264,8 +303,9 @@ function transitionToScene(index) {
 function updateUI() {
     mainContainer.className = `main-container step-${currentStep} scene-${currentScene}`;
 
-    // Control foreground layer visibility
-    if (currentScene === 1 && currentStep === 0) {
+    // Control foreground layer visibility for scenes with foreground
+    const hasForeground = foregroundImages[currentScene] !== null;
+    if (hasForeground && currentStep === 0) {
         foregroundMaterial.opacity = 1;
     } else {
         foregroundMaterial.opacity = 0;
@@ -277,7 +317,15 @@ function updateUI() {
         scrollIndicator.classList.remove('hidden');
     }
     renderSteps();
-    magnifier.style.backgroundImage = `url(${scenes[currentScene]})`;
+
+    // Explicitly handle magnifier visibility
+    if (currentScene === 0 && currentStep === 0) {
+        magnifier.style.backgroundImage = `url(${scenes[currentScene]})`;
+        // We don't force display block here, as it depends on mouse position,
+        // but we ensure the image is correct for when it IS shown.
+    } else {
+        magnifier.style.display = 'none';
+    }
 }
 
 function renderSteps() {
@@ -314,11 +362,13 @@ window.addEventListener('wheel', (e) => {
     if (Math.abs(e.deltaY) > 15) {
         isScrolling = true;
         if (e.deltaY > 0) {
-            if (currentStep === 0 && currentScene < 2) transitionToScene(currentScene + 1);
+            // Scroll down: go to next scene (up to Scene 4)
+            if (currentStep === 0 && currentScene < 4) transitionToScene(currentScene + 1);
             else { currentStep = Math.min(currentStep + 1, steps.length - 1); updateUI(); }
         } else {
+            // Scroll up: go to previous scene
             if (currentStep === 0 && currentScene > 0) transitionToScene(currentScene - 1);
-            else if (currentStep === 1) { currentStep = 0; transitionToScene(2); }
+            else if (currentStep === 1) { currentStep = 0; transitionToScene(4); }
             else { currentStep = Math.max(currentStep - 1, 0); updateUI(); }
         }
         setTimeout(() => isScrolling = false, 800);
