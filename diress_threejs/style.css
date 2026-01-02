@@ -577,17 +577,16 @@ body {
 .ecommerce-container {
     display: flex;
     flex-direction: column;
-    /* Stack slider and info vertically or handle differently */
-    gap: 60px;
+    justify-content: center;
+    /* Center slider vertically */
+    gap: 40px;
     width: 100%;
+    min-height: 100vh;
     max-width: 100%;
-    /* Go full width to the right */
     align-items: flex-start;
-    padding: 80px 40px 80px 220px;
-    /* 220px left padding to clear the slider completely */
+    padding: 40px 40px 40px 220px;
     box-sizing: border-box;
     overflow-x: hidden;
-    /* Hide sliding overflow */
 }
 
 /* Results Slider */
@@ -603,7 +602,8 @@ body {
     content: "";
     position: absolute;
     top: 0;
-    width: 150px;
+    width: 80px;
+    /* narrowed as requested */
     height: 100%;
     z-index: 2;
     pointer-events: none;
@@ -627,17 +627,34 @@ body {
 }
 
 .result-slide {
-    width: 400px;
-    /* Unified size */
-    aspect-ratio: 3/4;
+    width: 440px;
+    /* Increased width */
+    height: 650px;
+    /* Increased height explicitly */
     flex-shrink: 0;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
     background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.1);
-    /* Light border as requested */
     box-shadow: none;
-    /* Shadow removed as requested */
+    position: relative;
+}
+
+.slide-label {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .result-slide img {
@@ -653,7 +670,8 @@ body {
 
 @keyframes slideImages {
     0% {
-        transform: translateX(calc(-430px * 5));
+        transform: translateX(calc(-470px * 6));
+        /* Adjusted for new width (440) + gap (30) */
     }
 
     100% {
