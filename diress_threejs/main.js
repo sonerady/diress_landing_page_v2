@@ -706,7 +706,7 @@ function playEcommerceLoadingAnimation() {
     const spinner = document.getElementById('loading-spinner');
     const content = document.getElementById('ecommerce-content');
 
-    const text = "E-ticaret için gerekli görselleri üret";
+    const text = "Generate all essential visuals for your e-commerce";
     let index = 0;
 
     // Reset state for every playback

@@ -503,14 +503,13 @@ body {
     background: #1a1a1a;
     color: #fff;
     border: none;
-    padding: 18px 48px;
+    padding: 22px 60px;
     border-radius: 50px;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 600;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
     transition: all 0.3s ease;
     opacity: 0;
     transform: translateY(20px);
@@ -602,8 +601,8 @@ body {
     content: "";
     position: absolute;
     top: 0;
-    width: 80px;
-    /* narrowed as requested */
+    width: 40px;
+    /* narrowed further as requested */
     height: 100%;
     z-index: 2;
     pointer-events: none;
