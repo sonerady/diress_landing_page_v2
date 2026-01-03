@@ -136,6 +136,8 @@ const fragmentShader = `
 uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform float progress;
+uniform float opacity;
+uniform float disableBlur;
 uniform vec2 uvScale1;
 uniform vec2 uvScale2;
 uniform vec2 uvOffset; // Parallax Offset
@@ -144,10 +146,10 @@ varying vec2 vUv;
 vec4 blur(sampler2D tex, vec2 uv, float amount) {
     vec4 color = vec4(0.0);
     float total = 0.0;
-    float radius = amount * 0.02; 
+    float radius = amount * 0.02;
     for (float x = -2.0; x <= 2.0; x++) {
         for (float y = -2.0; y <= 2.0; y++) {
-            vec2 offset = vec2(x, y) * radius; 
+            vec2 offset = vec2(x, y) * radius;
             color += texture2D(tex, uv + offset);
             total += 1.0;
         }
@@ -156,18 +158,29 @@ vec4 blur(sampler2D tex, vec2 uv, float amount) {
 }
 
 void main() {
-    float blurAmount = sin(progress * 3.14159);
-    
     // Apply parallax offset
     vec2 offsetUV = vUv - uvOffset;
 
     vec2 correctedUV1 = (offsetUV - 0.5) * uvScale1 + 0.5;
     vec2 correctedUV2 = (offsetUV - 0.5) * uvScale2 + 0.5;
 
-    vec4 col1 = blur(texture1, correctedUV1, blurAmount);
-    vec4 col2 = blur(texture2, correctedUV2, blurAmount);
-    
-    gl_FragColor = mix(col1, col2, progress);
+    vec4 col1;
+    vec4 col2;
+
+    if (disableBlur > 0.5) {
+        // Direct texture sampling - no blur
+        col1 = texture2D(texture1, correctedUV1);
+        col2 = texture2D(texture2, correctedUV2);
+    } else {
+        // Use blur effect
+        float blurAmount = sin(progress * 3.14159);
+        col1 = blur(texture1, correctedUV1, blurAmount);
+        col2 = blur(texture2, correctedUV2, blurAmount);
+    }
+
+    vec4 finalColor = mix(col1, col2, progress);
+    finalColor.a *= opacity;
+    gl_FragColor = finalColor;
 }
 `;
 
@@ -243,9 +256,11 @@ const uniforms = {
     texture1: { value: textures[0] },
     texture2: { value: textures[0] },
     progress: { value: 0 },
+    opacity: { value: 1.0 },
+    disableBlur: { value: 0.0 },
     uvScale1: { value: new THREE.Vector2(1, 1) },
     uvScale2: { value: new THREE.Vector2(1, 1) },
-    uvOffset: { value: new THREE.Vector2(0, 0) } // NEW
+    uvOffset: { value: new THREE.Vector2(0, 0) }
 };
 const material = new THREE.ShaderMaterial({
     uniforms: uniforms,
@@ -727,7 +742,7 @@ function transitionToScene(index) {
 
 // UI
 function updateUI() {
-    mainContainer.className = `main-container step-${currentStep} scene-${currentScene}`;
+    mainContainer.className = `main-container step-${currentStep} scene-${currentScene} substep-${currentSubStep}`;
 
     // Control foreground layer visibility for scenes with foreground
     const hasForeground = foregroundImages[currentScene] !== null;
@@ -738,8 +753,8 @@ function updateUI() {
     }
 
     // Toggle DIRESS Text Plane and Gradient Plane
-    if ((currentStep === 0 || currentStep === 1) && currentScene > 0) {
-        // Show only in Scenes 1, 2, 3 (not Scene 0 in Step 0)
+    if ((currentStep === 0 || currentStep === 1) && currentScene > 0 && currentScene < 4) {
+        // Show only in Scenes 1, 2, 3 (not Scene 0 or Scene 4 video)
         textPlane.visible = true;
         gradientPlane.visible = true; // RE-ENABLED
         textPlane.material.color.setHex(0xffffff);
@@ -749,6 +764,7 @@ function updateUI() {
         textPlane.visible = false;
         gradientPlane.visible = false;
     }
+
 
     if (currentStep > 0 || currentScene > 0) {
         scrollIndicator.classList.add('hidden');
@@ -778,8 +794,9 @@ sceneThumbs.forEach(thumb => {
     thumb.addEventListener('click', () => {
         const targetScene = parseInt(thumb.dataset.scene);
         // Allow scene transitions when in Step 0 or Step 1 (Select Scene)
-        // Step 0 = Virtual Model (scene 0), Step 1 = Select Scene (scenes 1-3)
+        // Step 0 = Virtual Model (scene 0), Step 1 = Select Scene (scenes 1-4)
         if (targetScene !== currentScene && (currentStep === 0 || currentStep === 1)) {
+            if (currentStep === 0) currentStep = 1; // Move to Step 1 if clicking from Step 0
             transitionToScene(targetScene);
         }
     });
@@ -790,11 +807,14 @@ function renderSteps() {
     steps.forEach((label, index) => {
         // Determine visual active state (separate from actual currentStep)
         // Scene 0 = highlight Virtual Model (index 0)
-        // Scene 1-3 = highlight Select Scene (index 1)
+        // Scene 1-4 = highlight Select Scene (index 1)
         let isVisuallyActive = false;
         if (currentStep === 0) {
             if (currentScene === 0 && index === 0) isVisuallyActive = true;
-            else if (currentScene > 0 && currentScene < 4 && index === 1) isVisuallyActive = true;
+            else if (currentScene > 0 && currentScene <= 4 && index === 1) isVisuallyActive = true;
+        } else if (currentStep === 1) {
+            // Scene 1-4 all highlight Select Scene step
+            isVisuallyActive = (index === 1);
         } else {
             isVisuallyActive = (currentStep === index);
         }
@@ -894,7 +914,7 @@ window.addEventListener('wheel', (e) => {
             } else if (currentStep === 1 && currentScene < 3) {
                 // Through scenes 1->2->3 within Step 1
                 transitionToScene(currentScene + 1);
-            } else if (currentStep === 1 && currentScene === 3) {
+            } else if (currentStep === 1 && currentScene >= 3) {
                 // From Scene 3 to Ecommerce Kits (Step 2)
                 currentStep = 2;
                 updateUI();
@@ -930,7 +950,7 @@ window.addEventListener('wheel', (e) => {
                 transitionToScene(currentScene - 1);
             } else if (currentStep === 2) {
                 currentStep = 1;
-                transitionToScene(3);
+                transitionToScene(3); // Go back to Scene 3
             } else if (currentStep === 3) {
                 if (currentSubStep > 0) {
                     currentSubStep--;
@@ -1054,6 +1074,7 @@ const originalUpdateUI = updateUI;
 const customizeVideo = document.querySelector('.customize-video-bg');
 const colorPaletteGrid = document.getElementById('color-palette-grid');
 const skinTonePaletteGrid = document.getElementById('skin-tone-palette-grid');
+const ethnicityBg = document.getElementById('ethnicity-bg');
 
 // Generate 300 color cells for the palette with animated colors
 function generateColorPalette() {
@@ -1145,6 +1166,267 @@ function generateSkinTonePalette() {
 
 generateSkinTonePalette();
 
+// Ethnicity Animations
+let ethnicityAnimationPlayed = false;
+function playEthnicityAnimations() {
+    if (ethnicityAnimationPlayed) return;
+    ethnicityAnimationPlayed = true;
+
+    // Animate stat numbers
+    const statItems = document.querySelectorAll('.ethnicity-stats .stat-item');
+    statItems.forEach((item, index) => {
+        const targetValue = item.dataset.count;
+        const numberEl = item.querySelector('.stat-number');
+        if (!numberEl) return;
+
+        setTimeout(() => {
+            animateNumber(numberEl, targetValue);
+        }, index * 150);
+    });
+
+    // Start ethnicity text rotation
+    setTimeout(() => {
+        startEthnicityRotation();
+    }, 600);
+}
+
+function animateNumber(element, targetValue) {
+    const isK = targetValue.includes('K');
+    const isM = targetValue.includes('M');
+    let numValue = parseFloat(targetValue.replace('K', '').replace('M', ''));
+    let current = 0;
+    const duration = 1500;
+    const startTime = performance.now();
+
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        current = numValue * easeOut;
+
+        if (isM) {
+            element.textContent = current.toFixed(1) + 'M';
+        } else if (isK) {
+            element.textContent = Math.round(current) + 'K';
+        } else {
+            element.textContent = Math.round(current);
+        }
+
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+    requestAnimationFrame(update);
+}
+
+// Skin Tone image rotation (substep 2)
+const skinToneImagePaths = [
+    '/assets/skin_tone_1.png',
+    '/assets/skin_tone_2.png',
+    '/assets/skin_tone_3.png',
+    '/assets/skin_tone_4.png',
+    '/assets/skin_tone_5.png'
+];
+let skinToneIndex = 0;
+let skinToneInterval = null;
+
+// Load skin tone textures
+const skinToneTextures = skinToneImagePaths.map(path => {
+    const tex = loader.load(path, (t) => {
+        t.minFilter = THREE.LinearFilter;
+        t.generateMipmaps = false;
+    });
+    return tex;
+});
+
+// Direct switch for skin tone - no animation at all
+function transitionToSkinToneImage(newIndex) {
+    // Direct texture switch - no fade, no animation, no blur
+    uniforms.disableBlur.value = 1.0;
+    uniforms.texture1.value = skinToneTextures[newIndex];
+    uniforms.texture2.value = skinToneTextures[newIndex];
+    uniforms.progress.value = 0;
+    uniforms.opacity.value = 1;
+    skinToneIndex = newIndex;
+}
+
+function startSkinToneRotation() {
+    // Prevent double start
+    if (skinToneInterval) return;
+
+    skinToneIndex = 0;
+
+    // Set initial skin tone image - disable blur for skin tone
+    if (currentStep === 3 && currentSubStep === 2) {
+        uniforms.disableBlur.value = 1.0;
+        uniforms.texture1.value = skinToneTextures[0];
+        uniforms.texture2.value = skinToneTextures[0];
+        uniforms.progress.value = 0;
+        uniforms.opacity.value = 1;
+    }
+
+    // Change image every 2 seconds - direct switch, no animation
+    skinToneInterval = setInterval(() => {
+        if (currentStep === 3 && currentSubStep === 2) {
+            const nextIndex = (skinToneIndex + 1) % skinToneTextures.length;
+            transitionToSkinToneImage(nextIndex);
+        }
+    }, 2000);
+}
+
+function stopSkinToneRotation() {
+    if (skinToneInterval) {
+        clearInterval(skinToneInterval);
+        skinToneInterval = null;
+    }
+    skinToneIndex = 0;
+    // Re-enable blur for other transitions
+    uniforms.disableBlur.value = 0.0;
+}
+
+// Ethnicity text rotation with image transition
+const ethnicityNames = ['Asian', 'African', 'Latin', 'Arabian', 'Indian'];
+const ethnicityImagePaths = [
+    '/assets/center_image_2_asian.png',
+    '/assets/center_image_2_african.png',
+    '/assets/center_image_2_latine.png',
+    '/assets/center_image_2_arabian.png',
+    '/assets/center_image_2_indian.png'
+];
+let ethnicityIndex = 0;
+let ethnicityInterval = null;
+
+// Load ethnicity textures
+const ethnicityTextures = ethnicityImagePaths.map(path => {
+    const tex = loader.load(path, (t) => {
+        t.minFilter = THREE.LinearFilter;
+        t.generateMipmaps = false;
+    });
+    return tex;
+});
+
+// Ethnicity transition state - using shader opacity for smooth fade
+let isEthnicityTransitioning = false;
+let pendingEthnicityIndex = -1;
+
+function transitionToEthnicityImage(newIndex) {
+    if (isEthnicityTransitioning || newIndex === ethnicityIndex) return;
+
+    isEthnicityTransitioning = true;
+    pendingEthnicityIndex = newIndex;
+
+    // Fade out -> switch texture -> fade in (no blur)
+    const duration = 500; // ms total
+    const startTime = performance.now();
+
+    function fadeOut(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / (duration / 2), 1);
+        // Smooth ease out
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+        uniforms.opacity.value = 1 - easeProgress;
+
+        if (progress < 1) {
+            requestAnimationFrame(fadeOut);
+        } else {
+            // Switch texture at midpoint (no blur transition)
+            uniforms.texture1.value = ethnicityTextures[pendingEthnicityIndex];
+            uniforms.texture2.value = ethnicityTextures[pendingEthnicityIndex];
+            uniforms.progress.value = 0; // Keep at 0 to avoid blur
+
+            // Start fade in
+            fadeIn(performance.now());
+        }
+    }
+
+    function fadeIn(startTimeIn) {
+        function animate(currentTime) {
+            const elapsed = currentTime - startTimeIn;
+            const progress = Math.min(elapsed / (duration / 2), 1);
+            // Smooth ease in
+            const easeProgress = Math.pow(progress, 3);
+
+            uniforms.opacity.value = easeProgress;
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                uniforms.opacity.value = 1;
+                isEthnicityTransitioning = false;
+                pendingEthnicityIndex = -1;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(fadeOut);
+}
+
+function startEthnicityRotation() {
+    // Prevent double start
+    if (ethnicityInterval) return;
+
+    const ethnicityText = document.getElementById('ethnicity-text');
+    if (!ethnicityText) return;
+
+    ethnicityText.textContent = ethnicityNames[0];
+    ethnicityIndex = 0;
+
+    // Set initial ethnicity image
+    if (currentStep === 3 && currentSubStep === 3) {
+        uniforms.texture1.value = ethnicityTextures[0];
+        uniforms.texture2.value = ethnicityTextures[0];
+        uniforms.progress.value = 0;
+        uniforms.opacity.value = 1;
+    }
+
+    ethnicityInterval = setInterval(() => {
+        ethnicityText.style.opacity = '0';
+
+        const nextIndex = (ethnicityIndex + 1) % ethnicityNames.length;
+
+        // Start image transition (only if not already transitioning)
+        if (currentStep === 3 && currentSubStep === 3 && !isEthnicityTransitioning) {
+            transitionToEthnicityImage(nextIndex);
+        }
+
+        setTimeout(() => {
+            ethnicityIndex = nextIndex;
+            ethnicityText.textContent = ethnicityNames[ethnicityIndex];
+            ethnicityText.style.opacity = '1';
+        }, 300);
+    }, 2000);
+}
+
+function stopEthnicityRotation() {
+    if (ethnicityInterval) {
+        clearInterval(ethnicityInterval);
+        ethnicityInterval = null;
+    }
+    isEthnicityTransitioning = false;
+}
+
+// Reset ethnicity animation when leaving substep 3
+function resetEthnicityAnimations() {
+    ethnicityAnimationPlayed = false;
+    stopEthnicityRotation();
+    ethnicityIndex = 0;
+    pendingEthnicityIndex = -1;
+    const statNumbers = document.querySelectorAll('.ethnicity-stats .stat-number');
+    statNumbers.forEach(el => el.textContent = '0');
+    const ethnicityText = document.getElementById('ethnicity-text');
+    if (ethnicityText) ethnicityText.textContent = 'Asian';
+
+    // Reset to default scene texture when leaving ethnicity substep
+    if (textures[currentScene]) {
+        uniforms.texture1.value = textures[currentScene];
+        uniforms.texture2.value = textures[currentScene];
+        uniforms.progress.value = 0;
+        uniforms.opacity.value = 1;
+    }
+}
+
 updateUI = function () {
     originalUpdateUI();
 
@@ -1170,6 +1452,8 @@ updateUI = function () {
             }
             if (colorPaletteGrid) colorPaletteGrid.classList.add('active');
             if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
+            if (ethnicityBg) ethnicityBg.classList.remove('active');
+            stopSkinToneRotation();
         } else if (currentSubStep === 1) {
             // Hair Style - show video
             if (customizeVideo) {
@@ -1178,31 +1462,56 @@ updateUI = function () {
             }
             if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
             if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
+            if (ethnicityBg) ethnicityBg.classList.remove('active');
+            stopSkinToneRotation();
         } else if (currentSubStep === 2) {
-            // Skin Tone - show skin tone palette
+            // Skin Tone - show skin tone palette AND images with rotation
             if (customizeVideo) {
                 customizeVideo.classList.add('hidden');
                 customizeVideo.pause();
             }
             if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
             if (skinTonePaletteGrid) skinTonePaletteGrid.classList.add('active');
+            if (ethnicityBg) ethnicityBg.classList.remove('active');
+
+            // Start skin tone image rotation
+            startSkinToneRotation();
+        } else if (currentSubStep === 3) {
+            // Ethnicity - show ethnicity model with Three.js transition
+            if (customizeVideo) {
+                customizeVideo.classList.add('hidden');
+                customizeVideo.pause();
+            }
+            if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
+            if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
+            if (ethnicityBg) ethnicityBg.classList.add('active');
+            stopSkinToneRotation();
+
+            // Start ethnicity animations (texture is set inside startEthnicityRotation)
+            playEthnicityAnimations();
         } else {
-            // Other substeps - show video
+            // Other substeps (Mood, Body Shape) - show video
             if (customizeVideo) {
                 customizeVideo.classList.remove('hidden');
                 customizeVideo.play().catch(() => {});
             }
             if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
             if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
+            if (ethnicityBg) ethnicityBg.classList.remove('active');
+            stopSkinToneRotation();
+            resetEthnicityAnimations();
         }
     } else {
-        // Not in Step 3 - hide palettes, pause video
+        // Not in Step 3 - hide all backgrounds, pause video
         if (customizeVideo) {
             customizeVideo.classList.remove('hidden');
             customizeVideo.pause();
         }
         if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
         if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
+        if (ethnicityBg) ethnicityBg.classList.remove('active');
+        stopSkinToneRotation();
+        resetEthnicityAnimations();
     }
 
     // Reset logo color when leaving Step 5
