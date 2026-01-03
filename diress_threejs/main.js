@@ -23,6 +23,44 @@ const foregroundImages = [
 const steps = [
     'Virtual Model', 'Select Scene', 'Ecommerce Kits', 'Customize Model', 'Retouch', 'Change Color', 'Change Pose', 'Image to Video'
 ];
+
+// Ecommerce Slider Data
+const ecommerceSlides = [
+    { label: 'Editorial Style', src: '/assets/editorial_1.png', alt: 'Editorial 1' },
+    { label: 'Editorial Style', src: '/assets/editorial_2.png', alt: 'Editorial 2' },
+    { label: 'Editorial Style', src: '/assets/editorial_3.png', alt: 'Editorial 3' },
+    { label: 'Studio Style', src: '/assets/white_studio_2.png', alt: 'White Studio' },
+    { label: 'Product Detail', src: '/assets/detail_product.png', alt: 'Detail Product' },
+    { label: 'Ghost Mannequin', src: '/assets/ghost_mannequin.png', alt: 'Ghost Mannequin' }
+];
+
+// Fisher-Yates Shuffle Algorithm
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// Render slider with randomized images
+function renderEcommerceSlider() {
+    const slider = document.getElementById('results-slider');
+    if (!slider) return;
+
+    const shuffled = shuffleArray(ecommerceSlides);
+    // Double for seamless loop
+    const allSlides = [...shuffled, ...shuffled];
+
+    slider.innerHTML = allSlides.map(slide => `
+        <div class="result-slide">
+            <span class="slide-label">${slide.label}</span>
+            <img src="${slide.src}" alt="${slide.alt}">
+        </div>
+    `).join('');
+}
+
 let isScrolling = false;
 
 // Parallax State
@@ -739,6 +777,7 @@ function playEcommerceLoadingAnimation() {
 
                         // After 3 seconds, hide loading and show content
                         setTimeout(() => {
+                            renderEcommerceSlider(); // Randomize slider images
                             loadingOverlay.classList.add('hidden');
                             content.classList.add('visible');
                             isEcommerceAnimating = false; // Allow next animation
