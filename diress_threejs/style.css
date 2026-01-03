@@ -369,12 +369,12 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 55%;
+    width: 70%;
     height: 100%;
     background: linear-gradient(to right,
             rgba(255, 255, 255, 1) 0%,
-            rgba(255, 255, 255, 0.85) 30%,
-            rgba(255, 255, 255, 0.4) 60%,
+            rgba(255, 255, 255, 1) 45%,
+            rgba(255, 255, 255, 0.6) 75%,
             rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
     z-index: 5;
@@ -1705,7 +1705,7 @@ footer {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 2px solid rgba(0, 0, 0, 0.08);
     border-radius: 30px;
     padding: 24px 18px;
     display: flex;
@@ -1910,7 +1910,7 @@ footer {
     border-radius: 30px;
     padding: 24px 18px;
     box-shadow: none;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 2px solid rgba(0, 0, 0, 0.08);
     /* Light border for Virtual Model style */
 }
 
