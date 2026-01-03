@@ -112,8 +112,9 @@ body {
     transition: all 0.5s ease;
 }
 
-/* Step 3 (Customize Model) - Darker gradients for video background */
-.main-container.step-3::before {
+/* Step 3 (Customize Model) and Step 5 (Change Color) - Darker gradients for video background */
+.main-container.step-3::before,
+.main-container.step-5::before {
     z-index: 10 !important;
     background: linear-gradient(to bottom,
             rgba(255, 255, 255, 1) 0%,
@@ -123,7 +124,8 @@ body {
     height: 180px;
 }
 
-.main-container.step-3::after {
+.main-container.step-3::after,
+.main-container.step-5::after {
     z-index: 10 !important;
     background: linear-gradient(to top,
             rgba(255, 255, 255, 1) 0%,
@@ -199,13 +201,32 @@ body {
     pointer-events: none;
 }
 
-/* Ensure Center Image is above gradients in Step 3 and nudged slightly right */
-.main-container.step-3 .col-center {
+/* Ensure Center Image is above gradients in Step 3 and Step 5, nudged slightly right */
+.main-container.step-3 .col-center,
+.main-container.step-5 .col-center {
     z-index: 20 !important;
     position: relative;
     transform: translateX(40px);
     /* Nudge model to the right for better balance */
     transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Step 5 (Change Color) - Same as Customize Model */
+.main-container.step-5 .art-wrapper {
+    z-index: 20 !important;
+    position: relative;
+    filter:
+        drop-shadow(0 0 20px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 40px rgba(255, 255, 255, 0.7)) drop-shadow(0 0 60px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 80px rgba(255, 255, 255, 0.3));
+}
+
+.main-container.step-5 .art-wrapper canvas {
+    z-index: 20 !important;
+}
+
+/* Show customize grid in Step 5 as well */
+.main-container.step-5 .customize-grid-container {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Retouch Divider Line (Step 4) */
@@ -449,6 +470,65 @@ body {
 .main-container.step-2 .vertical-slider-container {
     border: 2px solid #cfcfcf4d !important;
     box-shadow: none !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Step 2 (Ecommerce Kits) - Reset slider colors to dark theme */
+.main-container.step-2 .vertical-slider-container .step-item .step-label {
+    color: rgba(0, 0, 0, 0.3) !important;
+}
+
+.main-container.step-2 .vertical-slider-container .step-item.active .step-label {
+    color: #000 !important;
+}
+
+.main-container.step-2 .vertical-slider-container .step-item .step-dot {
+    background: rgba(0, 0, 0, 0.15) !important;
+}
+
+.main-container.step-2 .vertical-slider-container .step-item.active .step-dot {
+    background: #000 !important;
+}
+
+.main-container.step-2 .vertical-slider-container .step-line {
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Step 2 (Ecommerce Kits) - Reset header/footer to dark theme */
+.main-container.step-2 .logo-text {
+    color: #333 !important;
+}
+
+.main-container.step-2 nav a {
+    color: #b0b0b0 !important;
+    font-weight: 400 !important;
+}
+
+.main-container.step-2 nav a.active,
+.main-container.step-2 nav a:hover {
+    color: #333 !important;
+    text-shadow: none !important;
+}
+
+.main-container.step-2 .get-started-btn {
+    background: linear-gradient(to top, #f0f0f0 0%, #ffffff 100%) !important;
+    color: #222 !important;
+    border-color: rgba(0, 0, 0, 0.18) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+.main-container.step-2 .socials i,
+.main-container.step-2 .legal-link {
+    color: #888 !important;
+}
+
+.main-container.step-2 .socials i:hover,
+.main-container.step-2 .legal-link:hover {
+    color: #333 !important;
+}
+
+.main-container.step-2 .legal-separator {
+    color: #ddd !important;
 }
 
 /* ========================================
@@ -1841,7 +1921,8 @@ footer {
     }
 }
 
-.main-container.step-3 .customize-submenu {
+.main-container.step-3 .customize-submenu,
+.main-container.step-5 .customize-submenu {
     opacity: 1;
     visibility: visible;
     transform: translateY(-50%) translateX(0);

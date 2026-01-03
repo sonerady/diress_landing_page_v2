@@ -774,7 +774,9 @@ function updateSceneSelector() {
 sceneThumbs.forEach(thumb => {
     thumb.addEventListener('click', () => {
         const targetScene = parseInt(thumb.dataset.scene);
-        if (targetScene !== currentScene && currentStep === 0) {
+        // Allow scene transitions when in Step 0 or Step 1 (Select Scene)
+        // Step 0 = Virtual Model (scene 0), Step 1 = Select Scene (scenes 1-3)
+        if (targetScene !== currentScene && (currentStep === 0 || currentStep === 1)) {
             transitionToScene(targetScene);
         }
     });
@@ -904,6 +906,11 @@ window.addEventListener('wheel', (e) => {
                     currentSubStep = 0;
                     updateUI();
                 }
+            } else if (currentStep === 4) {
+                // From Retouch to Change Color (Step 5)
+                currentStep = 5;
+                transitionToScene(4); // Use same video background as Customize Model
+                updateUI();
             } else {
                 currentStep = Math.min(currentStep + 1, steps.length - 1);
                 updateUI();
@@ -926,6 +933,10 @@ window.addEventListener('wheel', (e) => {
                     currentStep = 2;
                     updateUI();
                 }
+            } else if (currentStep === 5) {
+                // From Change Color back to Retouch (Step 4)
+                currentStep = 4;
+                updateUI();
             } else {
                 currentStep = Math.max(currentStep - 1, 0);
                 if (currentStep === 0) transitionToScene(0);
