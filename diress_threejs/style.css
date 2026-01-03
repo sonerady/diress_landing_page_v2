@@ -101,23 +101,25 @@ body {
     transition: all 0.5s ease;
 }
 
-/* Step 3 (Customize Model) - Add blur effect to gradients */
+/* Step 3 (Customize Model) - Darker gradients for video background */
 .main-container.step-3::before {
     z-index: 10 !important;
-    /* Above grid (1), below center image (20) */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 100%);
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.85) 30%,
+            rgba(255, 255, 255, 0.4) 60%,
+            rgba(255, 255, 255, 0) 100%);
+    height: 180px;
 }
 
 .main-container.step-3::after {
     z-index: 10 !important;
-    /* Above grid (1), below center image (20) */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    mask-image: linear-gradient(to top, black 0%, black 30%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to top, black 0%, black 30%, transparent 100%);
+    background: linear-gradient(to top,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.85) 30%,
+            rgba(255, 255, 255, 0.4) 60%,
+            rgba(255, 255, 255, 0) 100%);
+    height: 160px;
 }
 
 /* Ensure Center Image is above gradients in Step 3 */
@@ -346,13 +348,59 @@ body {
     visibility: hidden;
 }
 
+/* Customize Model Video Background */
+.customize-video-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Side Gradients for Step 3 (Customize Model) */
+.main-container.step-3 .customize-grid-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(to right,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.85) 30%,
+            rgba(255, 255, 255, 0.4) 60%,
+            rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.main-container.step-3 .customize-grid-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(to left,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.85) 30%,
+            rgba(255, 255, 255, 0.4) 60%,
+            rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    z-index: 5;
+}
+
 /* Customize Model Animated Grid - Behind center image */
 .customize-grid-container {
     position: absolute;
     top: 0;
     right: 0;
-    width: 800px;
-    /* Wider for 8 columns */
+    left: 0;
+    width: 100%;
+    /* Full width */
     height: 100%;
     z-index: 1;
     /* Below canvas (2) so center image is in front */
@@ -362,6 +410,25 @@ body {
     overflow: hidden;
     pointer-events: none;
     /* Prevent hover interactions and animation pausing */
+}
+
+/* Responsive Column Visibility - Hide outer columns on smaller screens */
+@media (max-width: 1400px) {
+    .customize-column:nth-child(n+11) {
+        display: none;
+    }
+}
+
+@media (max-width: 1000px) {
+    .customize-column:nth-child(n+7) {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .customize-column:nth-child(n+5) {
+        display: none;
+    }
 }
 
 .main-container.step-3 .customize-grid-container {
@@ -1593,6 +1660,102 @@ footer {
     font-weight: 300;
 }
 
+/* Customize Model Sub-menu Styling */
+.customize-submenu {
+    position: fixed;
+    left: 260px;
+    top: calc(50% - 28px);
+    /* Approximate alignment with Customize Model step */
+    transform: translateY(-50%) translateX(-20px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 101;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+}
+
+/* Specific left alignment for small screens is handled in media queries if needed */
+
+.main-container.step-3 .customize-submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+    pointer-events: all;
+}
+
+.submenu-arrow {
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.3);
+    animation: pulseArrow 2s infinite;
+}
+
+@keyframes pulseArrow {
+    0% {
+        transform: translateX(0);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: translateX(5px);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 0.3;
+    }
+}
+
+.submenu-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 24px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 180px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.submenu-item {
+    padding: 10px 14px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.submenu-item:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transform: translateX(4px);
+}
+
+.submenu-item .item-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #333;
+    text-transform: capitalize;
+}
+
+.submenu-item .item-tag {
+    font-size: 0.6rem;
+    background: #000;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
 /* Vertical Slider Container */
 .vertical-slider-container {
     position: fixed;
@@ -1767,7 +1930,8 @@ footer {
         display: none !important;
     }
 
-    .vertical-slider-container {
+    .vertical-slider-container,
+    .customize-submenu {
         display: none !important;
     }
 
