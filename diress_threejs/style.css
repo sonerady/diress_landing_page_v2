@@ -2219,6 +2219,7 @@ footer {
     bottom: 0;
     background: #b6b870;
     z-index: 1;
+    transition: background 0.4s ease;
 }
 
 /* Bottom Right Container */
@@ -2243,6 +2244,7 @@ footer {
     max-width: 320px;
     line-height: 1.4;
     margin: 0;
+    transition: color 0.3s ease;
 }
 
 /* Color Badges */
@@ -2259,6 +2261,8 @@ footer {
     padding: 6px 12px;
     border-radius: 3px;
     letter-spacing: 0.5px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
 }
 
 .change-color-badges .color-badge.olive {
@@ -2272,6 +2276,15 @@ footer {
 
 .change-color-badges .color-badge.burgundy {
     background: #722f37;
+}
+
+.change-color-badges .color-badge.active {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.change-color-badges .color-badge:hover {
+    transform: scale(1.05);
 }
 
 /* Side Images Container - Left */
@@ -2371,6 +2384,7 @@ footer {
     position: relative;
     z-index: 2;
     filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.25));
+    transition: transform 0.1s ease-out;
 }
 
 /* Background Boxes */
@@ -2390,6 +2404,10 @@ footer {
     width: 280px;
     border-radius: 0;
     position: relative;
+    --gradient-dark: rgba(80, 81, 45, 0.85);
+    --gradient-medium: rgba(100, 101, 60, 0.5);
+    --gradient-light: rgba(130, 131, 80, 0.2);
+    --gradient-transparent: rgba(182, 184, 112, 0);
 }
 
 .change-color-boxes .box::after {
@@ -2400,12 +2418,13 @@ footer {
     right: 0;
     height: 250px;
     background: linear-gradient(to top,
-            rgba(80, 81, 45, 0.85) 0%,
-            rgba(100, 101, 60, 0.5) 25%,
-            rgba(130, 131, 80, 0.2) 50%,
-            rgba(182, 184, 112, 0) 100%);
+            var(--gradient-dark) 0%,
+            var(--gradient-medium) 25%,
+            var(--gradient-light) 50%,
+            var(--gradient-transparent) 100%);
     pointer-events: none;
     z-index: 3;
+    transition: background 0.3s ease;
 }
 
 .change-color-boxes .box-left,
@@ -2430,6 +2449,7 @@ footer {
     height: 120%;
     width: auto;
     object-fit: contain;
+    transition: transform 0.1s ease-out;
 }
 
 .change-color-boxes .box-left .color-info {
@@ -2470,6 +2490,7 @@ footer {
     height: 100%;
     width: auto;
     object-fit: contain;
+    transition: transform 0.1s ease-out;
 }
 
 .change-color-boxes .box-right {
@@ -2482,9 +2503,10 @@ footer {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    height: 100%;
+    height: 110%;
     width: auto;
     object-fit: contain;
+    transition: transform 0.1s ease-out;
 }
 
 /* Feature Tags */
@@ -2602,7 +2624,8 @@ footer {
 
 /* Step 5 Header/Footer Styles */
 .main-container.step-5 .logo-text {
-    color: #6a6b4d !important;
+    color: #6a6b4d;
+    transition: color 0.3s ease;
 }
 
 .main-container.step-5 nav a {

@@ -1054,3 +1054,191 @@ updateUI = function () {
         playEcommerceLoadingAnimation();
     }
 };
+
+// Change Color Parallax Effect (Step 5)
+function initChangeColorParallax() {
+    const changeColorSection = document.querySelector('.change-color-section');
+    if (!changeColorSection) return;
+
+    const leftImg = changeColorSection.querySelector('.box-left img');
+    const centerImg = changeColorSection.querySelector('.box-center img');
+    const rightImg = changeColorSection.querySelector('.box-right img');
+    const frontImg = changeColorSection.querySelector('.change-color-center > img');
+
+    window.addEventListener('mousemove', (e) => {
+        if (currentStep !== 5) return;
+
+        const rect = changeColorSection.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+
+        // Parallax strength for each element - different directions
+        const strength = 12;
+        const frontStrength = 20;
+
+        // Left image moves opposite direction
+        if (leftImg) {
+            leftImg.style.transform = `translateX(calc(-50% + ${-x * strength}px)) scaleX(-1) translateY(${-y * strength * 0.5}px)`;
+        }
+        // Center image moves slightly
+        if (centerImg) {
+            centerImg.style.transform = `translateX(calc(-50% + ${x * strength * 0.5}px)) translateY(${y * strength * 0.3}px)`;
+        }
+        // Right image moves same as mouse
+        if (rightImg) {
+            rightImg.style.transform = `translateX(calc(-50% + ${x * strength}px)) translateY(${y * strength * 0.5}px)`;
+        }
+        // Front image has strongest parallax
+        if (frontImg) {
+            frontImg.style.transform = `translateX(${x * frontStrength}px) translateY(${y * frontStrength * 0.4}px)`;
+        }
+    });
+}
+
+// Initialize Change Color Parallax
+initChangeColorParallax();
+
+// Change Color Badge Click Handler (Step 5)
+function initChangeColorBadges() {
+    const badges = document.querySelectorAll('.change-color-badges .color-badge');
+    const changeColorSection = document.querySelector('.change-color-section');
+    if (!badges.length || !changeColorSection) return;
+
+    // Color scheme definitions
+    const colorSchemes = {
+        olive: {
+            bg: '#b6b870',
+            hex: '#B6B870',
+            name: 'Olive Green',
+            taglineColor: '#3a3b25',
+            logoColor: '#6b6c47',
+            gradientColors: {
+                dark: 'rgba(80, 81, 45, 0.85)',
+                medium: 'rgba(100, 101, 60, 0.5)',
+                light: 'rgba(130, 131, 80, 0.2)',
+                transparent: 'rgba(182, 184, 112, 0)'
+            },
+            images: {
+                front: '/assets/change_color_front.png',
+                left: '/assets/change_color_left.png',
+                back: '/assets/change_color_back.png',
+                zoom: '/assets/change_color_zoom.png'
+            }
+        },
+        burgundy: {
+            bg: '#722f37',
+            hex: '#722F37',
+            name: 'Burgundy',
+            taglineColor: '#4a2328',
+            logoColor: '#3d1a1e',
+            gradientColors: {
+                dark: 'rgba(60, 25, 29, 0.85)',
+                medium: 'rgba(85, 35, 41, 0.5)',
+                light: 'rgba(100, 42, 49, 0.2)',
+                transparent: 'rgba(114, 47, 55, 0)'
+            },
+            images: {
+                front: '/assets/change_color_front_2.png',
+                left: '/assets/change_color_left_2.png',
+                back: '/assets/change_color_back_2.png',
+                zoom: '/assets/change_color_zoom_2.png'
+            }
+        },
+        navy: {
+            bg: '#2c3e50',
+            hex: '#2C3E50',
+            name: 'Navy Blue',
+            taglineColor: '#1f3040',
+            logoColor: '#243848',
+            gradientColors: {
+                dark: 'rgba(25, 35, 45, 0.85)',
+                medium: 'rgba(35, 50, 65, 0.5)',
+                light: 'rgba(50, 70, 90, 0.2)',
+                transparent: 'rgba(44, 62, 80, 0)'
+            },
+            images: {
+                front: '/assets/change_color_front_3.png',
+                left: '/assets/change_color_left_3.png',
+                back: '/assets/change_color_back_3.png',
+                zoom: '/assets/change_color_zoom_3.png'
+            }
+        }
+    };
+
+    let currentColorScheme = 'olive';
+
+    function applyColorScheme(schemeName) {
+        if (currentColorScheme === schemeName) return;
+        currentColorScheme = schemeName;
+        const scheme = colorSchemes[schemeName];
+
+        // Update background
+        const bg = changeColorSection.querySelector('.change-color-bg');
+        if (bg) bg.style.background = scheme.bg;
+
+        // Update hex code and color name
+        const hexCode = changeColorSection.querySelector('.hex-code');
+        const colorName = changeColorSection.querySelector('.color-name');
+        if (hexCode) hexCode.textContent = scheme.hex;
+        if (colorName) colorName.textContent = scheme.name;
+
+        // Update tagline color
+        const tagline = changeColorSection.querySelector('.change-color-tagline');
+        if (tagline) tagline.style.color = scheme.taglineColor;
+
+        // Update logo text color
+        const logoText = document.querySelector('.logo-text');
+        if (logoText) {
+            logoText.style.color = scheme.logoColor;
+        }
+
+        // Update images
+        const frontImg = changeColorSection.querySelector('.change-color-center > img');
+        const leftImg = changeColorSection.querySelector('.box-left img');
+        const centerImg = changeColorSection.querySelector('.box-center img');
+        const rightImg = changeColorSection.querySelector('.box-right img');
+
+        if (frontImg) frontImg.src = scheme.images.front;
+        if (leftImg) leftImg.src = scheme.images.left;
+        if (centerImg) centerImg.src = scheme.images.back;
+        if (rightImg) rightImg.src = scheme.images.zoom;
+
+        // Update box gradients via CSS custom properties
+        const boxes = changeColorSection.querySelectorAll('.change-color-boxes .box');
+        boxes.forEach(box => {
+            box.style.setProperty('--gradient-dark', scheme.gradientColors.dark);
+            box.style.setProperty('--gradient-medium', scheme.gradientColors.medium);
+            box.style.setProperty('--gradient-light', scheme.gradientColors.light);
+            box.style.setProperty('--gradient-transparent', scheme.gradientColors.transparent);
+        });
+
+        // Update active badge state
+        badges.forEach(badge => {
+            badge.classList.remove('active');
+            if (badge.classList.contains(schemeName)) {
+                badge.classList.add('active');
+            }
+        });
+    }
+
+    // Add click handlers to badges
+    badges.forEach(badge => {
+        badge.style.cursor = 'pointer';
+        badge.addEventListener('click', () => {
+            if (badge.classList.contains('olive')) {
+                applyColorScheme('olive');
+            } else if (badge.classList.contains('burgundy')) {
+                applyColorScheme('burgundy');
+            } else if (badge.classList.contains('navy')) {
+                applyColorScheme('navy');
+            }
+        });
+    });
+
+    // Set initial active badge
+    const oliveBadge = document.querySelector('.color-badge.olive');
+    if (oliveBadge) oliveBadge.classList.add('active');
+}
+
+// Initialize Change Color Badges
+initChangeColorBadges();
