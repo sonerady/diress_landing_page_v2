@@ -2221,6 +2221,59 @@ footer {
     z-index: 1;
 }
 
+/* Bottom Right Container */
+.change-color-bottom-right {
+    position: absolute;
+    bottom: 50px;
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* Bottom Right Tagline */
+.change-color-tagline {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #3a3b25;
+    text-align: left;
+    max-width: 320px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Color Badges */
+.change-color-badges {
+    display: flex;
+    gap: 10px;
+}
+
+.change-color-badges .color-badge {
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+
+.change-color-badges .color-badge.olive {
+    background: #b6b870;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.change-color-badges .color-badge.navy {
+    background: #2c3e50;
+}
+
+.change-color-badges .color-badge.burgundy {
+    background: #722f37;
+}
+
 /* Side Images Container - Left */
 .change-color-side-left {
     position: absolute;
@@ -2327,7 +2380,7 @@ footer {
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 30px;
+    gap: 40px;
     align-items: flex-end;
     z-index: 1;
 }
@@ -2379,29 +2432,29 @@ footer {
     object-fit: contain;
 }
 
-.change-color-boxes .color-info-left {
+.change-color-boxes .box-left .color-info {
     position: absolute;
-    bottom: calc(65vh + 10px);
-    left: 0;
+    top: 15px;
+    left: 15px;
     z-index: 5;
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.change-color-boxes .color-info-left .hex-code {
+.change-color-boxes .box-left .color-info .hex-code {
     font-family: 'Poppins', sans-serif;
-    font-size: 22px;
+    font-size: 14px;
     font-weight: 700;
-    color: #fff;
+    color: #333;
 }
 
-.change-color-boxes .color-info-left .color-name {
+.change-color-boxes .box-left .color-info .color-name {
     font-family: 'Poppins', sans-serif;
-    font-size: 16px;
+    font-size: 11px;
     font-weight: 300;
     font-style: italic;
-    color: rgba(255, 255, 255, 0.8);
+    color: #555;
 }
 
 .change-color-boxes .box-center {
@@ -2549,7 +2602,7 @@ footer {
 
 /* Step 5 Header/Footer Styles */
 .main-container.step-5 .logo-text {
-    color: #fff !important;
+    color: #6a6b4d !important;
 }
 
 .main-container.step-5 nav a {
