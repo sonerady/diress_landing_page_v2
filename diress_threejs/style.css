@@ -645,14 +645,71 @@ body {
 
 /* Customize Model Video Background */
 .customize-video-bg {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     z-index: 1;
-    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.customize-video-bg.hidden {
+    opacity: 0;
+}
+
+/* Color Palette Grid for Hair Color */
+.color-palette-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(15, 1fr);
+    gap: 4px;
+    padding: 0;
+    background: #0a0a0a;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.color-palette-grid.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.color-palette-grid .color-cell {
+    border-radius: 3px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.color-palette-grid .color-cell:hover {
+    transform: scale(1.3);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    z-index: 10;
+}
+
+/* Wave animation for color cells */
+.color-palette-grid .color-cell {
+    animation: colorWave 3s ease-in-out infinite;
+    animation-delay: var(--delay);
+}
+
+@keyframes colorWave {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.3);
+    }
 }
 
 /* Side Gradients for Step 3 (Customize Model) */
@@ -997,17 +1054,17 @@ body {
 }
 
 .prompt-text {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 4.5rem;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     color: #1a1a1a;
     display: inline;
     line-height: 1.2;
 }
 
 .cursor-blink {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Poppins', sans-serif;
     font-size: 4.5rem;
     font-weight: 300;
     color: #1a1a1a;

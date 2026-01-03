@@ -665,7 +665,10 @@ function animate() {
         plane.visible = true; // Ensure it's visible in ALL other steps
     }
 
-    renderer.render(scene, camera);
+    // Only render Three.js when needed (not in Step 5 - Change Color uses DOM)
+    if (currentStep !== 5) {
+        renderer.render(scene, camera);
+    }
 }
 animate();
 
@@ -1048,10 +1051,87 @@ function playEcommerceLoadingAnimation() {
 
 // Watch for step changes to trigger animation
 const originalUpdateUI = updateUI;
+const customizeVideo = document.querySelector('.customize-video-bg');
+const colorPaletteGrid = document.getElementById('color-palette-grid');
+
+// Generate 300 color cells for the palette
+function generateColorPalette() {
+    if (!colorPaletteGrid || colorPaletteGrid.children.length > 0) return;
+
+    const colors = [];
+    // Generate beautiful color spectrum
+    for (let i = 0; i < 300; i++) {
+        const hue = (i * 1.2) % 360;
+        const saturation = 60 + Math.sin(i * 0.1) * 30;
+        const lightness = 40 + Math.cos(i * 0.15) * 20;
+        colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+    }
+
+    colors.forEach((color, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'color-cell';
+        cell.style.backgroundColor = color;
+        cell.style.setProperty('--delay', `${(index % 40) * 0.05}s`);
+        colorPaletteGrid.appendChild(cell);
+    });
+}
+
+generateColorPalette();
+
 updateUI = function () {
     originalUpdateUI();
+
+    // Ecommerce animation for Step 2
     if (currentStep === 2) {
         playEcommerceLoadingAnimation();
+    }
+
+    // Pause all videos when not in Scene selection steps
+    if (currentStep !== 0 && currentStep !== 1) {
+        videoElement1.pause();
+        videoElement2.pause();
+        videoElement3.pause();
+    }
+
+    // Control Customize Model backgrounds based on substep
+    if (currentStep === 3) {
+        if (currentSubStep === 0) {
+            // Hair Style - show video
+            if (customizeVideo) {
+                customizeVideo.classList.remove('hidden');
+                customizeVideo.play().catch(e => console.log('Video autoplay blocked'));
+            }
+            if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
+        } else if (currentSubStep === 1) {
+            // Hair Color - show color palette
+            if (customizeVideo) {
+                customizeVideo.classList.add('hidden');
+                customizeVideo.pause();
+            }
+            if (colorPaletteGrid) colorPaletteGrid.classList.add('active');
+        } else {
+            // Other substeps - show video
+            if (customizeVideo) {
+                customizeVideo.classList.remove('hidden');
+                customizeVideo.play().catch(e => console.log('Video autoplay blocked'));
+            }
+            if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
+        }
+    } else {
+        // Not in Step 3 - hide palette, pause video
+        if (customizeVideo) {
+            customizeVideo.classList.remove('hidden');
+            customizeVideo.pause();
+        }
+        if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
+    }
+
+    // Reset logo color when leaving Step 5
+    if (currentStep !== 5) {
+        const logoText = document.querySelector('.logo-text');
+        if (logoText) {
+            logoText.style.color = ''; // Reset to CSS default
+        }
     }
 };
 
