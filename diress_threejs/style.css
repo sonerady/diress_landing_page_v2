@@ -140,13 +140,8 @@ body {
 }
 
 .main-container.step-5::after {
-    z-index: 90 !important;
-    background: linear-gradient(to top,
-            rgba(100, 101, 60, 0.5) 0%,
-            rgba(130, 131, 80, 0.3) 30%,
-            rgba(182, 184, 112, 0.1) 60%,
-            rgba(182, 184, 112, 0) 100%) !important;
-    height: 180px;
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 /* Step 4 (Retouch) - White gradient for header and footer */
@@ -2322,6 +2317,7 @@ footer {
     object-fit: contain;
     position: relative;
     z-index: 2;
+    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.25));
 }
 
 /* Background Boxes */
@@ -2340,6 +2336,23 @@ footer {
     background: #fff;
     width: 280px;
     border-radius: 0;
+    position: relative;
+}
+
+.change-color-boxes .box::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 250px;
+    background: linear-gradient(to top,
+            rgba(80, 81, 45, 0.85) 0%,
+            rgba(100, 101, 60, 0.5) 25%,
+            rgba(130, 131, 80, 0.2) 50%,
+            rgba(182, 184, 112, 0) 100%);
+    pointer-events: none;
+    z-index: 3;
 }
 
 .change-color-boxes .box-left,
@@ -2362,6 +2375,61 @@ footer {
     left: 50%;
     transform: translateX(-50%) scaleX(-1);
     height: 120%;
+    width: auto;
+    object-fit: contain;
+}
+
+.change-color-boxes .color-info-left {
+    position: absolute;
+    bottom: calc(65vh + 10px);
+    left: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.change-color-boxes .color-info-left .hex-code {
+    font-family: 'Poppins', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.change-color-boxes .color-info-left .color-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.change-color-boxes .box-center {
+    overflow: hidden;
+    position: relative;
+}
+
+.change-color-boxes .box-center img {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+}
+
+.change-color-boxes .box-right {
+    overflow: hidden;
+    position: relative;
+}
+
+.change-color-boxes .box-right img {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
     width: auto;
     object-fit: contain;
 }
