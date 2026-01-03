@@ -803,7 +803,10 @@ function renderSteps() {
             currentStep = index;
             if (currentStep === 0) transitionToScene(0);
             else if (currentStep === 1) transitionToScene(1);
+            else if (currentStep === 2) transitionToScene(0); // Reset to scene 0 for Ecommerce
             else if (currentStep === 3) transitionToScene(4);
+            else if (currentStep === 4) transitionToScene(0); // Reset to scene 0 for Retouch
+            else if (currentStep === 5) transitionToScene(4); // Same as Customize Model
             updateUI();
         };
         verticalSlider.appendChild(item);
