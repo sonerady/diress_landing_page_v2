@@ -133,6 +133,72 @@ body {
     height: 160px;
 }
 
+/* Step 4 (Retouch) - White gradient for header and footer */
+.main-container.step-4::before {
+    opacity: 1;
+    visibility: visible;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.95) 30%,
+            rgba(255, 255, 255, 0.6) 60%,
+            rgba(255, 255, 255, 0) 100%);
+    height: 180px;
+    z-index: 80 !important;
+}
+
+.main-container.step-4::after {
+    opacity: 1;
+    visibility: visible;
+    background: linear-gradient(to top,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.95) 30%,
+            rgba(255, 255, 255, 0.6) 60%,
+            rgba(255, 255, 255, 0) 100%);
+    height: 160px;
+    z-index: 80 !important;
+}
+
+/* Ensure Retouch carousel is below gradients */
+.main-container.step-4 .art-wrapper {
+    z-index: 50 !important;
+}
+
+/* Right edge fade gradient for Retouch slider */
+.main-container.step-4::before {
+    /* Keep existing top gradient */
+}
+
+.main-container.step-4 .art-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 100%;
+    background: linear-gradient(to left,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.8) 30%,
+            rgba(255, 255, 255, 0) 100%);
+    z-index: 60;
+    pointer-events: none;
+}
+
+/* Left edge fade gradient for Retouch slider */
+.main-container.step-4 .art-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 100%;
+    background: linear-gradient(to right,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.8) 30%,
+            rgba(255, 255, 255, 0) 100%);
+    z-index: 60;
+    pointer-events: none;
+}
+
 /* Ensure Center Image is above gradients in Step 3 and nudged slightly right */
 .main-container.step-3 .col-center {
     z-index: 20 !important;
@@ -152,7 +218,8 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.08);
     /* Slightly softer */
-    z-index: 60;
+    z-index: 90;
+    /* Above gradients */
     transform: translateX(-50%);
     opacity: 0;
     visibility: hidden;
@@ -166,15 +233,16 @@ body {
 .retouch-divider .label-before,
 .retouch-divider .label-after {
     position: absolute;
-    top: 15%;
-    /* Positioned a bit above the center/images */
+    top: 12%;
+    /* Positioned below header */
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 2px;
-    color: rgba(0, 0, 0, 0.4);
+    color: rgba(0, 0, 0, 0.5);
     white-space: nowrap;
+    z-index: 100;
 }
 
 .retouch-divider .label-before {

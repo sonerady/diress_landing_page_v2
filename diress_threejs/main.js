@@ -35,28 +35,16 @@ const subSteps = [
 ];
 let currentSubStep = 0;
 
-// Retouch Slider Data (Step 4)
+// Retouch Slider Data (Step 4) - Local Assets
+// Before images: amateur-products-2 folder (.png)
+// After images: results-products-2 folder (.JPG)
 const retouchImages = [
-    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1529139513075-123128bc4a10?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1532332248682-206cc786359f?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1521334885634-954f9a39031c?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1501127122-f385ca6ddd9d?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1495385794356-15ec74485121?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1524383531126-77ca2412593e?w=600&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?w=600&h=600&fit=crop'
+    { before: '/assets/amateur-products-2/amateur-before-0.png', after: '/assets/results-products-2/amateur-after-0.JPG' },
+    { before: '/assets/amateur-products-2/amateur-before-1.png', after: '/assets/results-products-2/amateur-after-1.JPG' },
+    { before: '/assets/amateur-products-2/amateur-before-2.png', after: '/assets/results-products-2/amateur-after-2.JPG' },
+    { before: '/assets/amateur-products-2/amateur-before-3.png', after: '/assets/results-products-2/amateur-after-3.JPG' },
+    { before: '/assets/amateur-products-2/amateur-before-5.png', after: '/assets/results-products-2/amateur-after-5.JPG' },
+    { before: '/assets/amateur-products-2/amateur-before-6.png', after: '/assets/results-products-2/amateur-after-6.JPG' }
 ];
 
 // Ecommerce Slider Data (Step 2)
@@ -504,43 +492,89 @@ void main() {
 `;
 
 const retouchFragmentShader = `
-uniform sampler2D tDiffuse;
+uniform sampler2D tBefore;
+uniform sampler2D tAfter;
+uniform vec3 borderColor;
+uniform float borderWidth;
+uniform float cornerRadius;
 varying vec2 vUv;
 varying vec3 vWorldPosition;
 
+// Rounded rectangle SDF
+float roundedRect(vec2 uv, vec2 size, float radius) {
+    vec2 d = abs(uv - 0.5) * 2.0 - size + radius;
+    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - radius;
+}
+
 void main() {
-    vec4 color = texture2D(tDiffuse, vUv);
-    
-    // Position 0 is the center line
-    if (vWorldPosition.x < 0.0) {
-        // Grayscale for 'Before'
-        float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-        gl_FragColor = vec4(vec3(gray), 1.0);
-    } else {
-        // Full color + Green border for 'After'
-        float border = 0.05;
-        bool isBorder = vUv.x < border || vUv.x > 1.0 - border || vUv.y < border || vUv.y > 1.0 - border;
-        if (isBorder) {
-            gl_FragColor = vec4(0.2, 0.8, 0.2, 1.0); // Green
-        } else {
-            gl_FragColor = color;
-        }
+    // Rounded corners - discard pixels outside rounded rect
+    float dist = roundedRect(vUv, vec2(1.0), cornerRadius);
+    if (dist > 0.0) {
+        discard;
     }
+
+    // Use UV directly - the geometry itself handles aspect ratio
+    vec4 colorBefore = texture2D(tBefore, vUv);
+    vec4 colorAfter = texture2D(tAfter, vUv);
+
+    vec4 finalColor;
+    // Left side = Before, Right side = After
+    if (vWorldPosition.x < 0.0) {
+        finalColor = colorBefore;
+    } else {
+        finalColor = colorAfter;
+    }
+
+    // Subtle border near the edge
+    float borderDist = -dist;
+    float borderMask = smoothstep(borderWidth, borderWidth * 0.5, borderDist);
+
+    // Very subtle border blend
+    finalColor = mix(finalColor, vec4(borderColor, 1.0), borderMask * 0.08);
+
+    gl_FragColor = finalColor;
 }
 `;
 
 const retouchPlanes = [];
 const textureLoader = new THREE.TextureLoader();
 
+// Card size will be calculated based on screen aspect ratio
+let retouchCardSize = 0.65; // Slightly larger card size
+let retouchGap = 0.2;
+
 function createRetouchCarousel() {
-    const cardWidth = 0.9;
-    const gap = 0.2;
-    // Distribute images so more are on screen
-    retouchImages.forEach((url, i) => {
-        const geometry = new THREE.PlaneGeometry(cardWidth, cardWidth);
+    // Clear existing planes
+    retouchPlanes.forEach(p => retouchGroup.remove(p));
+    retouchPlanes.length = 0;
+
+    // Calculate aspect ratio to make cards appear square on screen
+    const screenAspect = artWrapper.clientWidth / artWrapper.clientHeight;
+
+    // Card dimensions - make height taller to compensate for wide screens
+    const cardWidth = retouchCardSize;
+    const cardHeight = retouchCardSize * screenAspect; // Compensate for screen aspect ratio
+    retouchGap = cardWidth * 0.3;
+
+    retouchImages.forEach((data, i) => {
+        const geometry = new THREE.PlaneGeometry(cardWidth, cardHeight);
+
+        // Load textures with proper settings
+        const beforeTexture = textureLoader.load(data.before);
+        const afterTexture = textureLoader.load(data.after);
+
+        beforeTexture.minFilter = THREE.LinearFilter;
+        beforeTexture.magFilter = THREE.LinearFilter;
+        afterTexture.minFilter = THREE.LinearFilter;
+        afterTexture.magFilter = THREE.LinearFilter;
+
         const material = new THREE.ShaderMaterial({
             uniforms: {
-                tDiffuse: { value: textureLoader.load(url) }
+                tBefore: { value: beforeTexture },
+                tAfter: { value: afterTexture },
+                borderColor: { value: new THREE.Color(0x000000) },
+                borderWidth: { value: 0.02 },
+                cornerRadius: { value: 0.08 } // Rounded corners
             },
             vertexShader: retouchVertexShader,
             fragmentShader: retouchFragmentShader,
@@ -548,14 +582,20 @@ function createRetouchCarousel() {
         });
 
         const plane = new THREE.Mesh(geometry, material);
-        // Initial distribution across a wider range
-        plane.position.x = (i - retouchImages.length / 2) * (cardWidth + gap);
-        plane.position.z = 1.0; // Higher Z to be clearly in front
+        plane.position.x = (i - retouchImages.length / 2) * (cardWidth + retouchGap);
+        plane.position.z = 1.0;
         retouchPlanes.push(plane);
         retouchGroup.add(plane);
     });
 }
 createRetouchCarousel();
+
+// Recreate carousel on resize to maintain square aspect
+window.addEventListener('resize', () => {
+    if (currentStep === 4) {
+        createRetouchCarousel();
+    }
+});
 
 // Animation
 let targetProgress = 0;
@@ -609,11 +649,9 @@ function animate() {
         plane.visible = false; // Hide ONLY in Retouch step
         if (textPlane) textPlane.visible = false;
 
-        const cardWidth = 0.9;
-        const gap = 0.2;
-        const stepSize = cardWidth + gap;
+        const stepSize = retouchCardSize + retouchGap;
         const totalWidth = retouchImages.length * stepSize;
-        const speed = 0.005;
+        const speed = 0.0015; // Smooth slow speed
 
         retouchPlanes.forEach(p => {
             p.position.x += speed;
