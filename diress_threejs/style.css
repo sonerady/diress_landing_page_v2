@@ -112,9 +112,8 @@ body {
     transition: all 0.5s ease;
 }
 
-/* Step 3 (Customize Model) and Step 5 (Change Color) - Darker gradients for video background */
-.main-container.step-3::before,
-.main-container.step-5::before {
+/* Step 3 (Customize Model) - Darker gradients for video background */
+.main-container.step-3::before {
     z-index: 10 !important;
     background: linear-gradient(to bottom,
             rgba(255, 255, 255, 1) 0%,
@@ -124,8 +123,7 @@ body {
     height: 180px;
 }
 
-.main-container.step-3::after,
-.main-container.step-5::after {
+.main-container.step-3::after {
     z-index: 10 !important;
     background: linear-gradient(to top,
             rgba(255, 255, 255, 1) 0%,
@@ -133,6 +131,22 @@ body {
             rgba(255, 255, 255, 0.4) 60%,
             rgba(255, 255, 255, 0) 100%);
     height: 160px;
+}
+
+/* Step 5 (Change Color) - No header gradient, only footer */
+.main-container.step-5::before {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.main-container.step-5::after {
+    z-index: 90 !important;
+    background: linear-gradient(to top,
+            rgba(100, 101, 60, 0.5) 0%,
+            rgba(130, 131, 80, 0.3) 30%,
+            rgba(182, 184, 112, 0.1) 60%,
+            rgba(182, 184, 112, 0) 100%) !important;
+    height: 180px;
 }
 
 /* Step 4 (Retouch) - White gradient for header and footer */
@@ -1819,8 +1833,9 @@ footer {
     margin-bottom: 10px;
 }
 
-/* Hide store badges in Customize Model step */
-.main-container.step-3 .store-badges {
+/* Hide store badges in Customize Model and Change Color steps */
+.main-container.step-3 .store-badges,
+.main-container.step-5 .store-badges {
     display: none;
 }
 
@@ -1977,12 +1992,17 @@ footer {
     }
 }
 
-.main-container.step-3 .customize-submenu,
-.main-container.step-5 .customize-submenu {
+.main-container.step-3 .customize-submenu {
     opacity: 1;
     visibility: visible;
     transform: translateY(-50%) translateX(0);
     pointer-events: all;
+}
+
+/* Hide submenu in Step 5 - Change Color has its own design */
+.main-container.step-5 .customize-submenu {
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 .submenu-card {
@@ -2158,6 +2178,437 @@ footer {
     opacity: 0;
     transform: translateY(20px);
     animation: textSlideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* ========================================
+   Change Color Section (Step 5)
+   ======================================== */
+.change-color-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 85;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+}
+
+.main-container.step-5 .change-color-section {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hide canvas/art-wrapper in step 5 */
+.main-container.step-5 .art-wrapper {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.main-container.step-5 .customize-grid-container {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Background */
+.change-color-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #b6b870;
+    z-index: 1;
+}
+
+/* Side Images Container - Left */
+.change-color-side-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.change-color-side-left .side-image {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.change-color-side-left .side-image img {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.7;
+    filter: brightness(0.9);
+}
+
+.change-color-side-left .side-image-1 img {
+    top: 0;
+    right: -50%;
+}
+
+.change-color-side-left .side-image-2 img {
+    bottom: 0;
+    right: -30%;
+}
+
+/* Side Images Container - Right */
+.change-color-side-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.change-color-side-right .side-image {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.change-color-side-right .side-image img {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0.7;
+    filter: brightness(0.9);
+}
+
+.change-color-side-right .side-image-3 img {
+    top: 0;
+    left: -50%;
+}
+
+.change-color-side-right .side-image-4 img {
+    bottom: 0;
+    left: -30%;
+}
+
+/* Main Center Image */
+.change-color-center {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height: 100%;
+    padding-bottom: 0;
+}
+
+.change-color-center > img {
+    height: 75%;
+    max-height: 75vh;
+    width: auto;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
+}
+
+/* Background Boxes */
+.change-color-boxes {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 30px;
+    align-items: flex-end;
+    z-index: 1;
+}
+
+.change-color-boxes .box {
+    background: #fff;
+    width: 280px;
+    border-radius: 0;
+}
+
+.change-color-boxes .box-left,
+.change-color-boxes .box-right {
+    height: 65vh;
+}
+
+.change-color-boxes .box-center {
+    height: 80vh;
+}
+
+.change-color-boxes .box-left {
+    overflow: hidden;
+    position: relative;
+}
+
+.change-color-boxes .box-left img {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) scaleX(-1);
+    height: 120%;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Feature Tags */
+.feature-tag {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    z-index: 20;
+    animation: floatTag 3s ease-in-out infinite;
+}
+
+.feature-tag .heart-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #fff;
+}
+
+.feature-tag .tag-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.3;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.tag-left-top {
+    top: 15%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.tag-right-top {
+    top: 15%;
+    right: 20%;
+    animation-delay: 1.5s;
+}
+
+@keyframes floatTag {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Product Info Card */
+.product-info-card {
+    position: absolute;
+    bottom: 10%;
+    left: 8%;
+    z-index: 20;
+    color: #fff;
+}
+
+.product-info-card .product-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    line-height: 1;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.product-info-card .product-details {
+    margin-bottom: 20px;
+}
+
+.product-info-card .product-details p {
+    font-family: 'Lato', sans-serif;
+    font-size: 1rem;
+    margin: 5px 0;
+    opacity: 0.9;
+}
+
+.product-info-card .product-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    border-radius: 30px;
+}
+
+.product-info-card .plus-icon {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+.product-info-card .category-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Step 5 Header/Footer Styles */
+.main-container.step-5 .logo-text {
+    color: #fff !important;
+}
+
+.main-container.step-5 nav a {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.main-container.step-5 nav a.active,
+.main-container.step-5 nav a:hover {
+    color: #fff !important;
+}
+
+.main-container.step-5 .get-started-btn {
+    background: #fff !important;
+    color: #333 !important;
+}
+
+.main-container.step-5 .socials i,
+.main-container.step-5 .legal-link {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.main-container.step-5 .socials i:hover,
+.main-container.step-5 .legal-link:hover {
+    color: #fff !important;
+}
+
+.main-container.step-5 .legal-separator {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.main-container.step-5 .vertical-slider-container {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.main-container.step-5 .vertical-slider-container .step-item .step-label {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.main-container.step-5 .vertical-slider-container .step-item.active .step-label {
+    color: #fff !important;
+}
+
+.main-container.step-5 .vertical-slider-container .step-item .step-dot {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.main-container.step-5 .vertical-slider-container .step-item.active .step-dot {
+    background: #fff !important;
+}
+
+.main-container.step-5 .vertical-slider-container .step-line {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Submenu styling for Step 5 */
+.main-container.step-5 .customize-submenu .submenu-card {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.main-container.step-5 .customize-submenu .sub-dot {
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.main-container.step-5 .customize-submenu .submenu-dot-item.active .sub-dot {
+    background: #fff !important;
+}
+
+.main-container.step-5 .customize-submenu .sub-label {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.main-container.step-5 .customize-submenu .submenu-dot-item.active .sub-label {
+    color: #fff !important;
+}
+
+.main-container.step-5 .customize-submenu .sub-subtitle {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.main-container.step-5 .customize-submenu .sub-line {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.main-container.step-5 .customize-submenu .sub-inline-description {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.main-container.step-5 .customize-submenu .submenu-arrow {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .product-info-card .product-title {
+        font-size: 3rem;
+    }
+
+    .tag-left-top {
+        left: 15%;
+    }
+
+    .tag-right-top {
+        right: 15%;
+    }
+}
+
+@media (max-width: 768px) {
+    .change-color-side-left,
+    .change-color-side-right {
+        display: none;
+    }
+
+    .product-info-card {
+        bottom: 15%;
+        left: 5%;
+    }
+
+    .product-info-card .product-title {
+        font-size: 2.5rem;
+    }
+
+    .feature-tag {
+        display: none;
+    }
 }
 
 .delay-1 {
