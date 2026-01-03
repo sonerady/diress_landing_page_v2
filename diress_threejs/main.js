@@ -24,6 +24,17 @@ const steps = [
     'Virtual Model', 'Select Scene', 'Ecommerce Kits', 'Customize Model', 'Retouch', 'Change Color', 'Change Pose', 'Image to Video'
 ];
 
+// Customize Model Sub-steps
+const subSteps = [
+    { label: 'Hair Style', subtitle: 'Sculpt & Define', description: 'Choose from a variety of contemporary and classic hairstyles to perfectly match your brand aesthetic.' },
+    { label: 'Hair Color', subtitle: 'Chrome & Pigment', description: 'Experiment with a full spectrum of natural shades and vibrant experimental colors with AI precision.' },
+    { label: 'Skin Tone', subtitle: 'Natural Radiance', description: 'Adjust skin tones to ensure diverse and accurate representation for your global audience.' },
+    { label: 'Ethnicity', subtitle: 'Global Diversity', description: 'Customize facial features and heritage to precisely target specific market demographics.' },
+    { label: 'Mood', subtitle: 'Expressions & Vibes', description: 'Set the perfect emotional tone for your campaign, from joyful and energetic to calm and sophisticated.' },
+    { label: 'Body Shape', subtitle: 'Silhouette & Form', description: 'Fine-tune body proportions and posture to showcase your apparel in the most flattering way.' }
+];
+let currentSubStep = 0;
+
 // Ecommerce Slider Data
 const ecommerceSlides = [
     { label: 'Editorial Style', src: '/assets/editorial_1.png', alt: 'Editorial 1' },
@@ -647,6 +658,64 @@ function renderSteps() {
             verticalSlider.appendChild(line);
         }
     });
+
+    renderSubSteps();
+}
+
+function renderSubSteps() {
+    const subMenu = document.getElementById('customize-submenu');
+    if (!subMenu) return;
+
+    // We keep the arrow from HTML, but refresh the card content
+    const card = subMenu.querySelector('.submenu-card');
+    if (!card) return;
+
+    card.innerHTML = '';
+    subSteps.forEach((sub, index) => {
+        const isActive = currentSubStep === index;
+        const item = document.createElement('div');
+        item.className = `submenu-dot-item ${isActive ? 'active' : ''} ${index < currentSubStep ? 'completed' : ''}`;
+        item.innerHTML = `
+            <span class="sub-dot"></span>
+            <span class="sub-label">${isActive ? 'Change ' : ''}${sub.label}</span>
+        `;
+        item.onclick = (e) => {
+            e.stopPropagation();
+            currentSubStep = index;
+            updateUI();
+        };
+        card.appendChild(item);
+
+        if (index < subSteps.length - 1) {
+            const line = document.createElement('div');
+            line.className = `sub-line ${index < currentSubStep ? 'completed' : ''}`;
+            card.appendChild(line);
+        }
+    });
+
+    updateSubStepContent();
+}
+
+function updateSubStepContent() {
+    const rightContent = document.getElementById('customize-content-right');
+    if (!rightContent) return;
+
+    const sub = subSteps[currentSubStep];
+
+    // Only update if visible
+    if (currentStep === 3) {
+        rightContent.classList.add('active');
+        rightContent.innerHTML = `
+            <div class="subtitle-container">
+                <span class="sub-small-tag">Customize AI</span>
+                <h2 class="animate-text-in">${sub.label}</h2>
+                <h3 class="animate-text-in delay-1">${sub.subtitle}</h3>
+                <p class="animate-text-in delay-2">${sub.description}</p>
+            </div>
+        `;
+    } else {
+        rightContent.classList.remove('active');
+    }
 }
 renderSteps();
 
@@ -677,7 +746,19 @@ window.addEventListener('wheel', (e) => {
             } else if (currentStep === 2) {
                 // From Ecommerce Kits, go to Customize Model (step 3)
                 currentStep = 3;
+                currentSubStep = 0; // Reset sub-step when entering Step 3
                 transitionToScene(4); // Transition to Scene 4 (center_image.png) for Customize Model
+            } else if (currentStep === 3) {
+                // Sub-step navigation for Customize Model
+                if (currentSubStep < subSteps.length - 1) {
+                    currentSubStep++;
+                    updateUI();
+                } else {
+                    // Completed all sub-steps, move to Retouch (Step 4)
+                    currentStep = 4;
+                    currentSubStep = 0; // Reset for next time
+                    updateUI();
+                }
             } else {
                 // Continue to next steps
                 currentStep = Math.min(currentStep + 1, steps.length - 1);
@@ -690,9 +771,15 @@ window.addEventListener('wheel', (e) => {
                 currentStep = 0;
                 updateUI();
             } else if (currentStep === 3) {
-                // From Customize Model, go back to Ecommerce Kits
-                currentStep = 2;
-                updateUI();
+                // Sub-step navigation for Customize Model (Up)
+                if (currentSubStep > 0) {
+                    currentSubStep--;
+                    updateUI();
+                } else {
+                    // Go back to Ecommerce Kits
+                    currentStep = 2;
+                    updateUI();
+                }
             } else if (currentStep === 0 && currentScene > 0) {
                 transitionToScene(currentScene - 1);
             } else {
