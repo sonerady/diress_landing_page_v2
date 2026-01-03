@@ -1059,11 +1059,11 @@ function generateColorPalette() {
     if (!colorPaletteGrid || colorPaletteGrid.children.length > 0) return;
 
     const colors = [];
-    // Generate beautiful color spectrum
+    // Generate beautiful pastel color spectrum
     for (let i = 0; i < 300; i++) {
         const hue = (i * 1.2) % 360;
-        const saturation = 60 + Math.sin(i * 0.1) * 30;
-        const lightness = 40 + Math.cos(i * 0.15) * 20;
+        const saturation = 45 + Math.sin(i * 0.08) * 20; // Lower saturation for pastel
+        const lightness = 75 + Math.cos(i * 0.12) * 10; // Higher lightness for pastel
         colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
     }
 
