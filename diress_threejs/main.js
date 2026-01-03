@@ -35,7 +35,31 @@ const subSteps = [
 ];
 let currentSubStep = 0;
 
-// Ecommerce Slider Data
+// Retouch Slider Data (Step 4)
+const retouchImages = [
+    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1529139513075-123128bc4a10?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1532332248682-206cc786359f?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1520006403909-838d6b92c22e?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1521334885634-954f9a39031c?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1501127122-f385ca6ddd9d?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1495385794356-15ec74485121?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1524383531126-77ca2412593e?w=600&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1518049362265-d5b2a6467637?w=600&h=600&fit=crop'
+];
+
+// Ecommerce Slider Data (Step 2)
 const ecommerceSlides = [
     { label: 'Editorial Style', src: '/assets/editorial_1.png', alt: 'Editorial 1' },
     { label: 'Editorial Style', src: '/assets/editorial_2.png', alt: 'Editorial 2' },
@@ -363,7 +387,7 @@ const gradientMaterial = new THREE.MeshBasicMaterial({
 
 const gradientPlane = new THREE.Mesh(gradientGeometry, gradientMaterial);
 gradientPlane.position.z = 0.02; // BEHIND Text (0.05) and FG (0.1), but FRONT of BG (0)
-// scene.add(gradientPlane);
+scene.add(gradientPlane);
 
 const textPlane = new THREE.Mesh(textGeometry, textMaterial);
 textPlane.position.z = 0.05; // FRONT of Gradient (0.02)
@@ -464,6 +488,75 @@ function updateTextScale() {
 updateTextScale();
 updateUI(); // Ensure correct initial state (Step 0, Scene 0)
 
+// Retouch Carousel Setup
+const retouchGroup = new THREE.Group();
+scene.add(retouchGroup);
+retouchGroup.visible = false;
+
+const retouchVertexShader = `
+varying vec2 vUv;
+varying vec3 vWorldPosition;
+void main() {
+    vUv = uv;
+    vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+const retouchFragmentShader = `
+uniform sampler2D tDiffuse;
+varying vec2 vUv;
+varying vec3 vWorldPosition;
+
+void main() {
+    vec4 color = texture2D(tDiffuse, vUv);
+    
+    // Position 0 is the center line
+    if (vWorldPosition.x < 0.0) {
+        // Grayscale for 'Before'
+        float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+        gl_FragColor = vec4(vec3(gray), 1.0);
+    } else {
+        // Full color + Green border for 'After'
+        float border = 0.05;
+        bool isBorder = vUv.x < border || vUv.x > 1.0 - border || vUv.y < border || vUv.y > 1.0 - border;
+        if (isBorder) {
+            gl_FragColor = vec4(0.2, 0.8, 0.2, 1.0); // Green
+        } else {
+            gl_FragColor = color;
+        }
+    }
+}
+`;
+
+const retouchPlanes = [];
+const textureLoader = new THREE.TextureLoader();
+
+function createRetouchCarousel() {
+    const cardWidth = 0.9;
+    const gap = 0.2;
+    // Distribute images so more are on screen
+    retouchImages.forEach((url, i) => {
+        const geometry = new THREE.PlaneGeometry(cardWidth, cardWidth);
+        const material = new THREE.ShaderMaterial({
+            uniforms: {
+                tDiffuse: { value: textureLoader.load(url) }
+            },
+            vertexShader: retouchVertexShader,
+            fragmentShader: retouchFragmentShader,
+            transparent: true
+        });
+
+        const plane = new THREE.Mesh(geometry, material);
+        // Initial distribution across a wider range
+        plane.position.x = (i - retouchImages.length / 2) * (cardWidth + gap);
+        plane.position.z = 1.0; // Higher Z to be clearly in front
+        retouchPlanes.push(plane);
+        retouchGroup.add(plane);
+    });
+}
+createRetouchCarousel();
+
 // Animation
 let targetProgress = 0;
 function animate() {
@@ -478,42 +571,60 @@ function animate() {
 
     // Apply parallax offsets for scenes with foreground (Scene 1, 2, 3)
     const hasForeground = foregroundImages[currentScene] !== null;
-    if ((hasForeground || currentScene === 0) && currentStep === 0) {
-        // Determine target based on lock state
-        const targetX = isParallaxLocked ? 0 : mouseX;
-        const targetY = isParallaxLocked ? 0 : -mouseY; // Note: Inverted Y moved here for consistency
+    // Parallax logic for Step 0 and Step 1
+    if ((hasForeground || currentScene === 0) && (currentStep === 0 || currentStep === 1)) {
+        // Parallax update
+        if (!isParallaxLocked && currentScene > 0) {
+            smoothedMouse.x += (mouseX - smoothedMouse.x) * 0.05;
+            smoothedMouse.y += (mouseY - smoothedMouse.y) * 0.05;
 
-        // Smoothly interpolate current values to target (Lerp factor 0.05 for smooth feel)
-        smoothedMouse.x += (targetX - smoothedMouse.x) * 0.05;
-        smoothedMouse.y += (targetY - smoothedMouse.y) * 0.05;
+            uniforms.uvOffset.value.x = smoothedMouse.x * parallaxStrength.background;
+            uniforms.uvOffset.value.y = smoothedMouse.y * parallaxStrength.background;
 
-        // Apply parallax via UV Offset for background plane (custom shader)
-        uniforms.uvOffset.value.x = smoothedMouse.x * parallaxStrength.background;
-        uniforms.uvOffset.value.y = smoothedMouse.y * parallaxStrength.background;
+            foregroundPlane.position.x = smoothedMouse.x * parallaxStrength.foreground;
+            foregroundPlane.position.y = smoothedMouse.y * parallaxStrength.foreground;
 
-        foregroundPlane.position.x = smoothedMouse.x * parallaxStrength.foreground;
-        foregroundPlane.position.y = smoothedMouse.y * parallaxStrength.foreground;
+            if (textPlane) {
+                const textParallaxFactor = 0.08;
+                textPlane.position.x = 0.02 + (smoothedMouse.x * textParallaxFactor);
+                textPlane.position.y = 0.65 + (smoothedMouse.y * textParallaxFactor);
+            }
+        } else {
+            // Reset positions when locked or scene 0
+            uniforms.uvOffset.value.x = 0;
+            uniforms.uvOffset.value.y = 0;
+            foregroundPlane.position.x = 0;
+            foregroundPlane.position.y = 0;
 
-        // DIRESS Text Parallax (Opposite direction, lighter)
-        if (textPlane) {
-            const textParallaxFactor = -0.02; // Opposite direction
-            textPlane.position.x = 0.02 + (smoothedMouse.x * textParallaxFactor);
-            textPlane.position.y = 0.65 + (smoothedMouse.y * textParallaxFactor);
+            if (textPlane) {
+                textPlane.position.x = 0.02;
+                textPlane.position.y = 0.65;
+            }
         }
+    }
+
+    // Retouch Carousel Animation
+    if (currentStep === 4) {
+        retouchGroup.visible = true;
+        plane.visible = false; // Hide ONLY in Retouch step
+        if (textPlane) textPlane.visible = false;
+
+        const cardWidth = 0.9;
+        const gap = 0.2;
+        const stepSize = cardWidth + gap;
+        const totalWidth = retouchImages.length * stepSize;
+        const speed = 0.005;
+
+        retouchPlanes.forEach(p => {
+            p.position.x += speed;
+            // Loop back seamlessly from right to left
+            if (p.position.x > totalWidth / 2) {
+                p.position.x -= totalWidth;
+            }
+        });
     } else {
-        // Reset positions when not in a parallax scene
-        uniforms.uvOffset.value.x = 0;
-        uniforms.uvOffset.value.y = 0;
-        foregroundPlane.position.x = 0;
-        foregroundPlane.position.y = 0;
-
-        if (textPlane) {
-            textPlane.position.x = 0.02;
-            textPlane.position.y = 0.65;
-        }
-        // Also reset smoothed values so next time it starts from center
-        smoothedMouse.x = 0;
-        smoothedMouse.y = 0;
+        retouchGroup.visible = false;
+        plane.visible = true; // Ensure it's visible in ALL other steps
     }
 
     renderer.render(scene, camera);
@@ -579,21 +690,23 @@ function updateUI() {
 
     // Control foreground layer visibility for scenes with foreground
     const hasForeground = foregroundImages[currentScene] !== null;
-    if (hasForeground && currentStep === 0) {
+    if (hasForeground && (currentStep === 0 || currentStep === 1)) {
         foregroundMaterial.opacity = 1;
     } else {
         foregroundMaterial.opacity = 0;
     }
 
     // Toggle DIRESS Text Plane and Gradient Plane
-    if (currentStep === 0 && currentScene > 0) {
-        // Show only in Scenes 1, 2, 3 (not Scene 0)
+    if ((currentStep === 0 || currentStep === 1) && currentScene > 0) {
+        // Show only in Scenes 1, 2, 3 (not Scene 0 in Step 0)
         textPlane.visible = true;
+        gradientPlane.visible = true; // RE-ENABLED
         textPlane.material.color.setHex(0xffffff);
         textPlane.position.z = 0.05;
         textPlane.renderOrder = 1;
     } else {
         textPlane.visible = false;
+        gradientPlane.visible = false;
     }
 
     if (currentStep > 0 || currentScene > 0) {
@@ -649,6 +762,8 @@ function renderSteps() {
         item.onclick = () => {
             currentStep = index;
             if (currentStep === 0) transitionToScene(0);
+            else if (currentStep === 1) transitionToScene(1);
+            else if (currentStep === 3) transitionToScene(4);
             updateUI();
         };
         verticalSlider.appendChild(item);
@@ -726,54 +841,56 @@ window.addEventListener('wheel', (e) => {
         isScrolling = true;
         if (e.deltaY > 0) {
             // Scroll down
-            if (currentStep === 0 && currentScene < 3) {
-                // Go through scenes 0->1->2->3
+            if (currentStep === 0 && currentScene === 0) {
+                // From Virtual Model to Select Scene (Step 1)
+                currentStep = 1;
+                transitionToScene(1);
+            } else if (currentStep === 1 && currentScene < 3) {
+                // Through scenes 1->2->3 within Step 1
                 transitionToScene(currentScene + 1);
-            } else if (currentStep === 0 && currentScene === 3) {
-                // From Scene 3, go to Ecommerce Kits (step 2)
+            } else if (currentStep === 1 && currentScene === 3) {
+                // From Scene 3 to Ecommerce Kits (Step 2)
                 currentStep = 2;
                 updateUI();
             } else if (currentStep === 2) {
-                // From Ecommerce Kits, go to Customize Model (step 3)
+                // To Customize Model (Step 3)
                 currentStep = 3;
-                currentSubStep = 0; // Reset sub-step when entering Step 3
-                transitionToScene(4); // Transition to Scene 4 (center_image.png) for Customize Model
+                currentSubStep = 0;
+                transitionToScene(4);
             } else if (currentStep === 3) {
-                // Sub-step navigation for Customize Model
                 if (currentSubStep < subSteps.length - 1) {
                     currentSubStep++;
                     updateUI();
                 } else {
-                    // Completed all sub-steps, move to Retouch (Step 4)
                     currentStep = 4;
-                    currentSubStep = 0; // Reset for next time
+                    currentSubStep = 0;
                     updateUI();
                 }
             } else {
-                // Continue to next steps
                 currentStep = Math.min(currentStep + 1, steps.length - 1);
                 updateUI();
             }
         } else {
             // Scroll up
-            if (currentStep === 2 && currentScene === 3) {
-                // From Ecommerce Kits, go back to Scene 3
+            if (currentStep === 1 && currentScene === 1) {
                 currentStep = 0;
-                updateUI();
+                transitionToScene(0);
+            } else if (currentStep === 1 && currentScene > 1) {
+                transitionToScene(currentScene - 1);
+            } else if (currentStep === 2) {
+                currentStep = 1;
+                transitionToScene(3);
             } else if (currentStep === 3) {
-                // Sub-step navigation for Customize Model (Up)
                 if (currentSubStep > 0) {
                     currentSubStep--;
                     updateUI();
                 } else {
-                    // Go back to Ecommerce Kits
                     currentStep = 2;
                     updateUI();
                 }
-            } else if (currentStep === 0 && currentScene > 0) {
-                transitionToScene(currentScene - 1);
             } else {
                 currentStep = Math.max(currentStep - 1, 0);
+                if (currentStep === 0) transitionToScene(0);
                 updateUI();
             }
         }

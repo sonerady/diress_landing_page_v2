@@ -73,10 +73,21 @@ body {
     z-index: 20 !important;
 }
 
-.main-container.step-0.scene-1::before,
-.main-container.step-0.scene-2::before,
-.main-container.step-0.scene-3::before {
+.main-container.scene-1::before,
+.main-container.scene-2::before,
+.main-container.scene-3::before {
     background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.6) 0%,
+            rgba(0, 0, 0, 0.3) 40%,
+            rgba(0, 0, 0, 0) 100%);
+    opacity: 1;
+    visibility: visible;
+}
+
+.main-container.scene-1::after,
+.main-container.scene-2::after,
+.main-container.scene-3::after {
+    background: linear-gradient(to top,
             rgba(0, 0, 0, 0.6) 0%,
             rgba(0, 0, 0, 0.3) 40%,
             rgba(0, 0, 0, 0) 100%);
@@ -131,6 +142,74 @@ body {
     transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* Retouch Divider Line (Step 4) */
+.retouch-divider {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 6px;
+    /* Increased width */
+    height: 100%;
+    background: rgba(0, 0, 0, 0.08);
+    /* Slightly softer */
+    z-index: 60;
+    transform: translateX(-50%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.retouch-divider .label-before,
+.retouch-divider .label-after {
+    position: absolute;
+    top: 15%;
+    /* Positioned a bit above the center/images */
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
+}
+
+.retouch-divider .label-before {
+    right: 40px;
+    /* Shift to left of divider */
+}
+
+.retouch-divider .label-after {
+    left: 40px;
+    /* Shift to right of divider */
+    color: #2ecc71;
+    /* Green color for 'After' */
+}
+
+.main-container.step-4 .retouch-divider {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Ensure Carousel images are centered and large in Step 4 */
+.main-container.step-4 .art-wrapper {
+    z-index: 50 !important;
+    /* Above everything else */
+    width: 100%;
+    height: 100%;
+    transform: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hide other Step 3 elements that might interfere */
+.main-container.step-4 .customize-grid-container {
+    display: none;
+}
 
 
 .main-container.step-0.scene-1::after,
@@ -183,35 +262,35 @@ body {
 } */
 
 /* Header Contrast for Dark Scene */
-.main-container.step-0.scene-1 .logo-text,
-.main-container.step-0.scene-2 .logo-text,
-.main-container.step-0.scene-3 .logo-text {
+.main-container.scene-1 .logo-text,
+.main-container.scene-2 .logo-text,
+.main-container.scene-3 .logo-text {
     color: #fff;
 }
 
-.main-container.step-0.scene-1 nav a,
-.main-container.step-0.scene-2 nav a,
-.main-container.step-0.scene-3 nav a {
+.main-container.scene-1 nav a,
+.main-container.scene-2 nav a,
+.main-container.scene-3 nav a {
     color: rgba(255, 255, 255, 0.9);
     /* Brighter */
     font-weight: 500;
 }
 
-.main-container.step-0.scene-1 nav a.active,
-.main-container.step-0.scene-1 nav a:hover,
-.main-container.step-0.scene-2 nav a.active,
-.main-container.step-0.scene-2 nav a:hover,
-.main-container.step-0.scene-3 nav a.active,
-.main-container.step-0.scene-3 nav a:hover {
+.main-container.scene-1 nav a.active,
+.main-container.scene-1 nav a:hover,
+.main-container.scene-2 nav a.active,
+.main-container.scene-2 nav a:hover,
+.main-container.scene-3 nav a.active,
+.main-container.scene-3 nav a:hover {
     color: #fff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     /* Glow effect */
 }
 
 /* Brighten 'Get Started' button in dark scene */
-.main-container.step-0.scene-1 .get-started-btn,
-.main-container.step-0.scene-2 .get-started-btn,
-.main-container.step-0.scene-3 .get-started-btn {
+.main-container.scene-1 .get-started-btn,
+.main-container.scene-2 .get-started-btn,
+.main-container.scene-3 .get-started-btn {
     background: #fff;
     color: #000;
     border-color: #fff;
@@ -219,27 +298,27 @@ body {
 }
 
 /* Footer Contrast for Dark Scene */
-.main-container.step-0.scene-1 .socials i,
-.main-container.step-0.scene-1 .legal-link,
-.main-container.step-0.scene-2 .socials i,
-.main-container.step-0.scene-2 .legal-link,
-.main-container.step-0.scene-3 .socials i,
-.main-container.step-0.scene-3 .legal-link {
+.main-container.scene-1 .socials i,
+.main-container.scene-1 .legal-link,
+.main-container.scene-2 .socials i,
+.main-container.scene-2 .legal-link,
+.main-container.scene-3 .socials i,
+.main-container.scene-3 .legal-link {
     color: rgba(255, 255, 255, 0.7);
 }
 
-.main-container.step-0.scene-1 .socials i:hover,
-.main-container.step-0.scene-1 .legal-link:hover,
-.main-container.step-0.scene-2 .socials i:hover,
-.main-container.step-0.scene-2 .legal-link:hover,
-.main-container.step-0.scene-3 .socials i:hover,
-.main-container.step-0.scene-3 .legal-link:hover {
+.main-container.scene-1 .socials i:hover,
+.main-container.scene-1 .legal-link:hover,
+.main-container.scene-2 .socials i:hover,
+.main-container.scene-2 .legal-link:hover,
+.main-container.scene-3 .socials i:hover,
+.main-container.scene-3 .legal-link:hover {
     color: #fff;
 }
 
-.main-container.step-0.scene-1 .legal-separator,
-.main-container.step-0.scene-2 .legal-separator,
-.main-container.step-0.scene-3 .legal-separator {
+.main-container.scene-1 .legal-separator,
+.main-container.scene-2 .legal-separator,
+.main-container.scene-3 .legal-separator {
     color: rgba(255, 255, 255, 0.2);
 }
 
@@ -941,9 +1020,9 @@ body {
 }
 
 /* Show container for Scene 1, 2, 3 */
-.main-container.step-0.scene-1 .scene-text-container,
-.main-container.step-0.scene-2 .scene-text-container,
-.main-container.step-0.scene-3 .scene-text-container {
+.main-container.scene-1 .scene-text-container,
+.main-container.scene-2 .scene-text-container,
+.main-container.scene-3 .scene-text-container {
     opacity: 1;
     visibility: visible;
 }
@@ -1021,9 +1100,9 @@ body {
     margin-top: 20px;
 }
 
-.main-container.step-0.scene-1 .scene-1-text,
-.main-container.step-0.scene-2 .scene-2-text,
-.main-container.step-0.scene-3 .scene-3-text {
+.main-container.scene-1 .scene-1-text,
+.main-container.scene-2 .scene-2-text,
+.main-container.scene-3 .scene-3-text {
     opacity: 1;
     visibility: visible;
     display: block;
@@ -1086,9 +1165,9 @@ body {
         margin-right: -40%;
     }
 
-    .main-container.step-0.scene-1 .scene-1-text,
-    .main-container.step-0.scene-2 .scene-2-text,
-    .main-container.step-0.scene-3 .scene-3-text {
+    .main-container.scene-1 .scene-1-text,
+    .main-container.scene-2 .scene-2-text,
+    .main-container.scene-3 .scene-3-text {
         transform: translate(50%, -50%);
         /* Final centered position */
     }
@@ -2003,6 +2082,49 @@ footer {
 
 .step-line.completed {
     background: rgba(0, 0, 0, 0.4);
+}
+
+/* Dark Mode styles for Slider in Select Scene (Scene 1, 2, 3) */
+.main-container.scene-1 .vertical-slider-container,
+.main-container.scene-2 .vertical-slider-container,
+.main-container.scene-3 .vertical-slider-container {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.main-container.scene-1 .vertical-slider-container .step-item .step-dot,
+.main-container.scene-2 .vertical-slider-container .step-item .step-dot,
+.main-container.scene-3 .vertical-slider-container .step-item .step-dot {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.main-container.scene-1 .vertical-slider-container .step-item.active .step-dot,
+.main-container.scene-2 .vertical-slider-container .step-item.active .step-dot,
+.main-container.scene-3 .vertical-slider-container .step-item.active .step-dot {
+    background: #fff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.main-container.scene-1 .vertical-slider-container .step-item .step-label,
+.main-container.scene-2 .vertical-slider-container .step-item .step-label,
+.main-container.scene-3 .vertical-slider-container .step-item .step-label {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.main-container.scene-1 .vertical-slider-container .step-item.active .step-label,
+.main-container.scene-2 .vertical-slider-container .step-item.active .step-label,
+.main-container.scene-3 .vertical-slider-container .step-item.active .step-label {
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.main-container.scene-1 .vertical-slider-container .step-line,
+.main-container.scene-2 .vertical-slider-container .step-line,
+.main-container.scene-3 .vertical-slider-container .step-line {
+    background: rgba(255, 255, 255, 0.15);
 }
 
 @media (max-width: 1200px) {
