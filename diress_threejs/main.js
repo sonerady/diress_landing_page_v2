@@ -26,12 +26,12 @@ const steps = [
 
 // Customize Model Sub-steps
 const subSteps = [
-    { label: 'Hair Style', subtitle: 'Sculpt & Define', description: 'Choose from a variety of contemporary and classic hairstyles to perfectly match your brand aesthetic.' },
-    { label: 'Hair Color', subtitle: 'Chrome & Pigment', description: 'Experiment with a full spectrum of natural shades and vibrant experimental colors with AI precision.' },
-    { label: 'Skin Tone', subtitle: 'Natural Radiance', description: 'Adjust skin tones to ensure diverse and accurate representation for your global audience.' },
-    { label: 'Ethnicity', subtitle: 'Global Diversity', description: 'Customize facial features and heritage to precisely target specific market demographics.' },
-    { label: 'Mood', subtitle: 'Expressions & Vibes', description: 'Set the perfect emotional tone for your campaign, from joyful and energetic to calm and sophisticated.' },
-    { label: 'Body Shape', subtitle: 'Silhouette & Form', description: 'Fine-tune body proportions and posture to showcase your apparel in the most flattering way.' }
+    { label: 'Hair Style', subtitle: 'Sculpt & Define', description: 'Binlerce premium saç stili arasından markanızın estetiğine en uygun olanı seçin veya yapay zeka ile hayalinizdeki formu oluşturun.' },
+    { label: 'Hair Color', subtitle: 'Chrome & Pigment', description: 'Doğal tonlardan deneysel pigmentlere kadar uzanan geniş renk yelpazesi ile modelinizin saç rengini kusursuz bir hassasiyetle belirleyin.' },
+    { label: 'Skin Tone', subtitle: 'Natural Radiance', description: 'Küresel kitlelere hitap etmek için modelinizin cilt tonunu en gerçekçi ve kapsayıcı şekilde kişiselleştirin.' },
+    { label: 'Ethnicity', subtitle: 'Global Diversity', description: 'Hedef pazarınıza tam uyum sağlamak için modelinizin yüz hatlarını ve etnik kökenini yapay zeka yardımıyla detaylandırın.' },
+    { label: 'Mood', subtitle: 'Expressions & Vibes', description: 'Kampanya ruhunuzu yansıtacak en doğru ifadeyi; enerjik, sofistike veya dingin modlar arasından belirleyin.' },
+    { label: 'Body Shape', subtitle: 'Silhouette & Form', description: 'Kıyafetlerin formunu en iyi şekilde sergilemek için modelinizin vücut hatlarını ve duruşunu ideal oranlara getirin.' }
 ];
 let currentSubStep = 0;
 
@@ -677,7 +677,11 @@ function renderSubSteps() {
         item.className = `submenu-dot-item ${isActive ? 'active' : ''} ${index < currentSubStep ? 'completed' : ''}`;
         item.innerHTML = `
             <span class="sub-dot"></span>
-            <span class="sub-label">${isActive ? 'Change ' : ''}${sub.label}</span>
+            <div class="sub-text-wrapper">
+                <span class="sub-label">${isActive ? 'Change ' : ''}${sub.label}</span>
+                <span class="sub-subtitle">${sub.subtitle}</span>
+                ${isActive ? `<p class="sub-inline-description animate-text-in">${sub.description}</p>` : ''}
+            </div>
         `;
         item.onclick = (e) => {
             e.stopPropagation();
@@ -698,23 +702,9 @@ function renderSubSteps() {
 
 function updateSubStepContent() {
     const rightContent = document.getElementById('customize-content-right');
-    if (!rightContent) return;
-
-    const sub = subSteps[currentSubStep];
-
-    // Only update if visible
-    if (currentStep === 3) {
-        rightContent.classList.add('active');
-        rightContent.innerHTML = `
-            <div class="subtitle-container">
-                <span class="sub-small-tag">Customize AI</span>
-                <h2 class="animate-text-in">${sub.label}</h2>
-                <h3 class="animate-text-in delay-1">${sub.subtitle}</h3>
-                <p class="animate-text-in delay-2">${sub.description}</p>
-            </div>
-        `;
-    } else {
+    if (rightContent) {
         rightContent.classList.remove('active');
+        rightContent.style.display = 'none'; // Ensure it's hidden
     }
 }
 renderSteps();
