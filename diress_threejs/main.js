@@ -26,8 +26,8 @@ const steps = [
 
 // Customize Model Sub-steps
 const subSteps = [
-    { label: 'Hair Style', subtitle: 'Sculpt & Define', description: 'Binlerce premium saç stili arasından markanızın estetiğine en uygun olanı seçin veya yapay zeka ile hayalinizdeki formu oluşturun.' },
     { label: 'Hair Color', subtitle: 'Chrome & Pigment', description: 'Doğal tonlardan deneysel pigmentlere kadar uzanan geniş renk yelpazesi ile modelinizin saç rengini kusursuz bir hassasiyetle belirleyin.' },
+    { label: 'Hair Style', subtitle: 'Sculpt & Define', description: 'Binlerce premium saç stili arasından markanızın estetiğine en uygun olanı seçin veya yapay zeka ile hayalinizdeki formu oluşturun.' },
     { label: 'Skin Tone', subtitle: 'Natural Radiance', description: 'Küresel kitlelere hitap etmek için modelinizin cilt tonunu en gerçekçi ve kapsayıcı şekilde kişiselleştirin.' },
     { label: 'Ethnicity', subtitle: 'Global Diversity', description: 'Hedef pazarınıza tam uyum sağlamak için modelinizin yüz hatlarını ve etnik kökenini yapay zeka yardımıyla detaylandırın.' },
     { label: 'Mood', subtitle: 'Expressions & Vibes', description: 'Kampanya ruhunuzu yansıtacak en doğru ifadeyi; enerjik, sofistike veya dingin modlar arasından belirleyin.' },
@@ -1053,30 +1053,97 @@ function playEcommerceLoadingAnimation() {
 const originalUpdateUI = updateUI;
 const customizeVideo = document.querySelector('.customize-video-bg');
 const colorPaletteGrid = document.getElementById('color-palette-grid');
+const skinTonePaletteGrid = document.getElementById('skin-tone-palette-grid');
 
-// Generate 300 color cells for the palette
+// Generate 300 color cells for the palette with animated colors
 function generateColorPalette() {
     if (!colorPaletteGrid || colorPaletteGrid.children.length > 0) return;
 
-    const colors = [];
-    // Generate beautiful pastel color spectrum
+    const cells = [];
     for (let i = 0; i < 300; i++) {
-        const hue = (i * 1.2) % 360;
-        const saturation = 45 + Math.sin(i * 0.08) * 20; // Lower saturation for pastel
-        const lightness = 75 + Math.cos(i * 0.12) * 10; // Higher lightness for pastel
-        colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
-    }
-
-    colors.forEach((color, index) => {
         const cell = document.createElement('div');
         cell.className = 'color-cell';
-        cell.style.backgroundColor = color;
-        cell.style.setProperty('--delay', `${(index % 40) * 0.05}s`);
+        cell.dataset.index = i;
         colorPaletteGrid.appendChild(cell);
-    });
+        cells.push(cell);
+    }
+
+    // Animate colors continuously
+    let time = 0;
+    function animateColors() {
+        time += 0.005;
+        cells.forEach((cell, index) => {
+            const row = Math.floor(index / 20);
+            const col = index % 20;
+
+            // Create wave effect with time
+            const hue = (index * 1.2 + time * 50 + Math.sin(row * 0.3 + time * 2) * 30 + Math.cos(col * 0.3 + time * 1.5) * 30) % 360;
+            const saturation = 50 + Math.sin(time * 1.5 + index * 0.02) * 15;
+            const lightness = 75 + Math.cos(time * 2 + index * 0.03) * 10;
+
+            cell.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        });
+        requestAnimationFrame(animateColors);
+    }
+    animateColors();
 }
 
 generateColorPalette();
+
+// Generate 300 skin tone cells for the palette with animated skin tones
+function generateSkinTonePalette() {
+    if (!skinTonePaletteGrid || skinTonePaletteGrid.children.length > 0) return;
+
+    const cells = [];
+    for (let i = 0; i < 300; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'skin-cell';
+        cell.dataset.index = i;
+        skinTonePaletteGrid.appendChild(cell);
+        cells.push(cell);
+    }
+
+    // Skin tone base colors (from light to dark, with warm undertones)
+    const skinToneRanges = [
+        { hMin: 15, hMax: 35, sMin: 20, sMax: 50, lMin: 85, lMax: 95 },  // Very light/fair
+        { hMin: 20, hMax: 40, sMin: 30, sMax: 55, lMin: 75, lMax: 85 },  // Light
+        { hMin: 18, hMax: 38, sMin: 35, sMax: 60, lMin: 65, lMax: 75 },  // Light-medium
+        { hMin: 15, hMax: 35, sMin: 40, sMax: 65, lMin: 55, lMax: 65 },  // Medium
+        { hMin: 12, hMax: 32, sMin: 45, sMax: 70, lMin: 45, lMax: 55 },  // Medium-tan
+        { hMin: 10, hMax: 30, sMin: 50, sMax: 75, lMin: 35, lMax: 45 },  // Tan
+        { hMin: 8, hMax: 28, sMin: 55, sMax: 80, lMin: 25, lMax: 35 },   // Dark
+        { hMin: 5, hMax: 25, sMin: 40, sMax: 70, lMin: 15, lMax: 25 }    // Very dark
+    ];
+
+    // Animate skin tones continuously
+    let time = 0;
+    function animateSkinTones() {
+        time += 0.003;
+        cells.forEach((cell, index) => {
+            const row = Math.floor(index / 20);
+            const col = index % 20;
+
+            // Select skin tone range based on row position
+            const rangeIndex = Math.floor((row / 15) * skinToneRanges.length);
+            const range = skinToneRanges[Math.min(rangeIndex, skinToneRanges.length - 1)];
+
+            // Create subtle wave effect with time
+            const hueOffset = Math.sin(col * 0.2 + time * 1.5) * 5 + Math.cos(row * 0.3 + time) * 3;
+            const satOffset = Math.sin(time * 1.2 + index * 0.01) * 8;
+            const lightOffset = Math.cos(time * 0.8 + col * 0.15) * 5;
+
+            const hue = range.hMin + ((range.hMax - range.hMin) * (col / 20)) + hueOffset;
+            const saturation = range.sMin + ((range.sMax - range.sMin) * 0.5) + satOffset;
+            const lightness = range.lMin + ((range.lMax - range.lMin) * 0.5) + lightOffset;
+
+            cell.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        });
+        requestAnimationFrame(animateSkinTones);
+    }
+    animateSkinTones();
+}
+
+generateSkinTonePalette();
 
 updateUI = function () {
     originalUpdateUI();
@@ -1096,34 +1163,46 @@ updateUI = function () {
     // Control Customize Model backgrounds based on substep
     if (currentStep === 3) {
         if (currentSubStep === 0) {
-            // Hair Style - show video
-            if (customizeVideo) {
-                customizeVideo.classList.remove('hidden');
-                customizeVideo.play().catch(e => console.log('Video autoplay blocked'));
-            }
-            if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
-        } else if (currentSubStep === 1) {
             // Hair Color - show color palette
             if (customizeVideo) {
                 customizeVideo.classList.add('hidden');
                 customizeVideo.pause();
             }
             if (colorPaletteGrid) colorPaletteGrid.classList.add('active');
+            if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
+        } else if (currentSubStep === 1) {
+            // Hair Style - show video
+            if (customizeVideo) {
+                customizeVideo.classList.remove('hidden');
+                customizeVideo.play().catch(() => {});
+            }
+            if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
+            if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
+        } else if (currentSubStep === 2) {
+            // Skin Tone - show skin tone palette
+            if (customizeVideo) {
+                customizeVideo.classList.add('hidden');
+                customizeVideo.pause();
+            }
+            if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
+            if (skinTonePaletteGrid) skinTonePaletteGrid.classList.add('active');
         } else {
             // Other substeps - show video
             if (customizeVideo) {
                 customizeVideo.classList.remove('hidden');
-                customizeVideo.play().catch(e => console.log('Video autoplay blocked'));
+                customizeVideo.play().catch(() => {});
             }
             if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
+            if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
         }
     } else {
-        // Not in Step 3 - hide palette, pause video
+        // Not in Step 3 - hide palettes, pause video
         if (customizeVideo) {
             customizeVideo.classList.remove('hidden');
             customizeVideo.pause();
         }
         if (colorPaletteGrid) colorPaletteGrid.classList.remove('active');
+        if (skinTonePaletteGrid) skinTonePaletteGrid.classList.remove('active');
     }
 
     // Reset logo color when leaving Step 5

@@ -712,6 +712,43 @@ body {
     }
 }
 
+/* Skin Tone Palette Grid */
+.skin-tone-palette-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(15, 1fr);
+    gap: 6px;
+    padding: 20px;
+    background: #ffffff;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.skin-tone-palette-grid.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.skin-tone-palette-grid .skin-cell {
+    border-radius: 6px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.skin-tone-palette-grid .skin-cell:hover {
+    transform: scale(1.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
 /* Side Gradients for Step 3 (Customize Model) */
 .main-container.step-3 .customize-grid-container::before {
     content: '';
