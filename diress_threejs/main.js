@@ -1149,7 +1149,7 @@ function initChangeColorBadges() {
             hex: '#2C3E50',
             name: 'Navy Blue',
             taglineColor: '#1f3040',
-            logoColor: '#243848',
+            logoColor: '#151d25',
             gradientColors: {
                 dark: 'rgba(25, 35, 45, 0.85)',
                 medium: 'rgba(35, 50, 65, 0.5)',
@@ -1182,9 +1182,9 @@ function initChangeColorBadges() {
         if (hexCode) hexCode.textContent = scheme.hex;
         if (colorName) colorName.textContent = scheme.name;
 
-        // Update tagline color
+        // Update tagline color (always white)
         const tagline = changeColorSection.querySelector('.change-color-tagline');
-        if (tagline) tagline.style.color = scheme.taglineColor;
+        if (tagline) tagline.style.color = '#ffffff';
 
         // Update logo text color
         const logoText = document.querySelector('.logo-text');
@@ -1238,6 +1238,57 @@ function initChangeColorBadges() {
     // Set initial active badge
     const oliveBadge = document.querySelector('.color-badge.olive');
     if (oliveBadge) oliveBadge.classList.add('active');
+
+    // Auto color rotation
+    const colorOrder = ['olive', 'navy', 'burgundy'];
+    let colorIndex = 0;
+    let autoRotateInterval = null;
+
+    function startAutoRotate() {
+        if (autoRotateInterval) return;
+        autoRotateInterval = setInterval(() => {
+            if (currentStep !== 5) return; // Only rotate when in Step 5
+            colorIndex = (colorIndex + 1) % colorOrder.length;
+            const nextColor = colorOrder[colorIndex];
+            currentColorScheme = ''; // Reset to allow transition
+            applyColorScheme(nextColor);
+        }, 4000); // Change every 4 seconds
+    }
+
+    function stopAutoRotate() {
+        if (autoRotateInterval) {
+            clearInterval(autoRotateInterval);
+            autoRotateInterval = null;
+        }
+    }
+
+    // Start auto-rotation when entering Step 5
+    setInterval(() => {
+        if (currentStep === 5 && !autoRotateInterval) {
+            startAutoRotate();
+        } else if (currentStep !== 5 && autoRotateInterval) {
+            stopAutoRotate();
+            // Reset to olive when leaving Step 5
+            colorIndex = 0;
+            currentColorScheme = '';
+            applyColorScheme('olive');
+        }
+    }, 500);
+
+    // Pause auto-rotation on badge click, resume after delay
+    badges.forEach(badge => {
+        badge.addEventListener('click', () => {
+            stopAutoRotate();
+            // Update colorIndex to match clicked color
+            if (badge.classList.contains('olive')) colorIndex = 0;
+            else if (badge.classList.contains('navy')) colorIndex = 1;
+            else if (badge.classList.contains('burgundy')) colorIndex = 2;
+            // Resume auto-rotation after 6 seconds
+            setTimeout(() => {
+                if (currentStep === 5) startAutoRotate();
+            }, 6000);
+        });
+    });
 }
 
 // Initialize Change Color Badges
