@@ -9,7 +9,7 @@ const scenes = [
     '/assets/center_image_scene_1.png',     // Scene 1 (index 1)
     '/assets/center_image_scene_2.png',     // Scene 2 (index 2)
     '/assets/center_image_scene_3.png',     // Scene 3 (index 3)
-    '/assets/center_image.png'              // Scene 4 (index 4) - original
+    '/assets/center_image_2.png'            // Scene 4 (index 4) - same as Scene 0
 ];
 
 // Foreground layers for parallax (Scene 1=1, Scene 2=2, Scene 3=3)
@@ -361,7 +361,7 @@ textPlane.position.x = 0.02; // Slightly to the right
 textPlane.scale.set(0.8, 1.1, 1); // Stretched Y to fix squashed look
 scene.add(textPlane);
 
-function getScale(image) {
+function getScale(image, sceneIndex = null) {
     if (!image || !image.width) return new THREE.Vector2(1, 1);
     const screenAspect = artWrapper.clientWidth / artWrapper.clientHeight;
     const imageAspect = image.width / image.height;
@@ -518,12 +518,12 @@ function transitionToScene(index) {
         // Texture2 is currently dominant. Set Texture1 to current view and animate back to 0? 
         // No, let's just cycle.
         uniforms.texture1.value = uniforms.texture2.value;
-        uniforms.uvScale1.value.copy(getScale(uniforms.texture1.value.image));
+        uniforms.uvScale1.value.copy(getScale(uniforms.texture1.value.image, currentScene));
         uniforms.progress.value = 0;
     }
 
     uniforms.texture2.value = nextTexture;
-    uniforms.uvScale2.value.copy(getScale(nextTexture.image));
+    uniforms.uvScale2.value.copy(getScale(nextTexture.image, index));
     targetProgress = 1;
 
     currentScene = index;
@@ -674,6 +674,10 @@ window.addEventListener('wheel', (e) => {
                 // From Scene 3, go to Ecommerce Kits (step 2)
                 currentStep = 2;
                 updateUI();
+            } else if (currentStep === 2) {
+                // From Ecommerce Kits, go to Customize Model (step 3)
+                currentStep = 3;
+                transitionToScene(4); // Transition to Scene 4 (center_image.png) for Customize Model
             } else {
                 // Continue to next steps
                 currentStep = Math.min(currentStep + 1, steps.length - 1);
@@ -684,6 +688,10 @@ window.addEventListener('wheel', (e) => {
             if (currentStep === 2 && currentScene === 3) {
                 // From Ecommerce Kits, go back to Scene 3
                 currentStep = 0;
+                updateUI();
+            } else if (currentStep === 3) {
+                // From Customize Model, go back to Ecommerce Kits
+                currentStep = 2;
                 updateUI();
             } else if (currentStep === 0 && currentScene > 0) {
                 transitionToScene(currentScene - 1);
